@@ -1,0 +1,224 @@
+<body>
+
+  <div class="main-wrapper">
+
+    <!-- HEADER -->
+    <div class="header clearfix">
+
+      <!-- TOPBAR -->
+      <div class="topBar">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 hidden-sm hidden-xs">
+              <ul class="list-inline">
+                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                <li><a href="#"><i class="fa fa-vimeo"></i></a></li>
+                <li><a href="#"><i class="fa fa-tumblr"></i></a></li>
+              </ul>
+            </div>
+            <div class="col-md-6 col-xs-12">
+              <ul class="list-inline pull-right">
+                <li><span><a data-toggle="modal" href='/login'>Log in</a>
+                    <small>or</small>
+                    <a data-toggle="modal" href='/signup'>Create an account</a></span>
+                </li>
+                <li><span><a data-toggle="modal" href="/" ng-click="logout()">Log out</a></span></li>
+                <li class="dropdown searchBox">
+                  <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-search"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                      <span class="input-group">
+                        <input type="text" class="form-control" placeholder="Search…" aria-describedby="basic-addon2">
+                        <span class="input-group-addon" id="basic-addon2">Search</span>
+                      </span>
+                    </li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="cart-page.html" class="dropdown-toggle" data-toggle="dropdown disabled"><i class="fa fa-shopping-cart"></i>$0</a>
+                  <ul class="dropdown-menu dropdown-menu-right">
+                    <li>Item(s) in your cart</li>
+                    <li>
+                      <a ng-href="/single-product">
+                        <div class="media">
+                          <img class="media-left media-object" src="img/home/cart-items/cart-item-01.jpg" alt="cart-Image">
+                          <div class="media-body">
+                            <h5 class="media-heading">INCIDIDUNT UT <br><span>2 X $199</span></h5>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li>
+                      <a ng-href="/single-product">
+                        <div class="media">
+                          <img class="media-left media-object" src="img/home/cart-items/cart-item-01.jpg" alt="cart-Image">
+                          <div class="media-body">
+                            <h5 class="media-heading">INCIDIDUNT UT <br><span>2 X $199</span></h5>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="btn-group" role="group" aria-label="...">
+                        <button type="button" class="btn btn-default" onclick="location.href='/cart-page';">Shopping Cart</button>
+                        <button type="button" class="btn btn-default" onclick="location.href='/checkout-step-1';">Checkout</button>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAVBAR -->
+      <nav class="navbar navbar-main navbar-default" role="navigation">
+        <div class="container">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" ng-href="/"><img src="/assets/img/logo1.png" alt=""></a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li class="active"><a ng-href="/">Home</a></li>
+              <li class="dropdown megaDropMenu">
+                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="300" data-close-others="true" aria-expanded="false">Bags</b></a>
+                <ul class="dropdown-menu row">
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Products Grid View</li>
+                      <li><a ng-click="bags()" ng-href="/product-page">bags</a></li>
+                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
+                      <li><a ng-href="/product-page">Products 3 Columns V1</a></li>
+                      <li><a ng-href="/product-page">Products 3 Columns V2</a></li>
+                      <li><a ng-href="/product-page">Products 4 Columns</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Products List View</li>
+                      <li><a ng-href="/product-page">Products Sidebar Left</a></li>
+                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
+                      <li class="listHeading">Others</li>
+                      <li><a ng-href="/product-page">Single Product</a></li>
+                      <li><a ng-href="/product-page">Cart Page</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Checkout</li>
+                      <li><a ng-href="/product-page">Step 1 - Address</a></li>
+                      <li><a ng-href="/product-page">Step 2 - Shipping</a></li>
+                      <li><a ng-href="/product-page">Step 3 - Payment</a></li>
+                      <li><a ng-href="/product-page">Step 4 - Payment</a></li>
+                      <li><a ng-href="/product-page">Order Complete</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <a ng-href="/single-product" class="menu-photo"><img src="img/menu-photo.jpg" alt="menu-img"></a>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown megaDropMenu">
+                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="300" data-close-others="true" aria-expanded="false">Accessories</b></a>
+                <ul class="dropdown-menu row">
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Products Grid View</li>
+                      <li><a ng-href="/product-page">Products Sidebar Left</a></li>
+                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
+                      <li><a ng-href="/product-page">Products 3 Columns V1</a></li>
+                      <li><a ng-href="/product-page">Products 3 Columns V2</a></li>
+                      <li><a ng-href="/product-page">Products 4 Columns</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Products List View</li>
+                      <li><a ng-href="/product-page">Products Sidebar Left</a></li>
+                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
+                      <li class="listHeading">Others</li>
+                      <li><a ng-href="/product-page">Single Product</a></li>
+                      <li><a ng-href="/product-page">Cart Page</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Checkout</li>
+                      <li><a ng-href="/product-page">Step 1 - Address</a></li>
+                      <li><a ng-href="/product-page">Step 2 - Shipping</a></li>
+                      <li><a ng-href="/product-page">Step 3 - Payment</a></li>
+                      <li><a ng-href="/product-page">Step 4 - Payment</a></li>
+                      <li><a ng-href="/product-page">Order Complete</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <a href="#" class="menu-photo"><img src="img/menu-photo.jpg" alt="menu-img"></a>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown megaDropMenu">
+                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="300" data-close-others="true" aria-expanded="false">Tech</b></a>
+                <ul class="dropdown-menu row">
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Products Grid View</li>
+                      <li><a ng-href="/product-page">Products Sidebar Left</a></li>
+                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
+                      <li><a ng-href="/product-page">Products 3 Columns V1</a></li>
+                      <li><a ng-href="/product-page">Products 3 Columns V2</a></li>
+                      <li><a ng-href="/product-page">Products 4 Columns</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Products List View</li>
+                      <li><a ng-href="/product-page">Products Sidebar Left</a></li>
+                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
+                      <li class="listHeading">Others</li>
+                      <li><a ng-href="/product-page">Single Product</a></li>
+                      <li><a ng-href="/product-page">Cart Page</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <ul class="list-unstyled">
+                      <li>Checkout</li>
+                      <li><a ng-href="/product-page">Step 1 - Address</a></li>
+                      <li><a ng-href="/product-page">Step 2 - Shipping</a></li>
+                      <li><a ng-href="/product-page">Step 3 - Payment</a></li>
+                      <li><a ng-href="/product-page">Step 4 - Payment</a></li>
+                      <li><a ng-href="/product-page">Order Complete</a></li>
+                    </ul>
+                  </li>
+                  <li class="col-sm-3 col-xs-12">
+                    <a ng-href="/single-product" class="menu-photo"><img src="img/menu-photo.jpg" alt="menu-img"></a>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Account</a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li><a href="/account-dashboard">Dashboard</a></li>
+                  <li><a href="/account-profile">Profile</a></li>
+                  <li><a href="/account-all-orders">All Orders</a></li>
+                  <li><a href="/account-wishlist">Wishlist</a></li>
+                  <li><a href="/account-address">Address</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </div>
+      </nav>
+
+    </div>

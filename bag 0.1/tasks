@@ -1,0 +1,37 @@
+Notes 
+
+Page entry
+
+- Create account (completed)
+- Login (completed)
+- Page authentication (completed)
+- add the product page (completed)
+- add the single product page (completed)
+- Add shopping cart page (completed)
+- Add about us page (completed)
+- Add password recovery page page (completed)
+- Add the terms and conditions page (completed)
+- Add checkout pages (completed)
+    - Add shipping address page (completed)
+    - Add Shipping Method  (completed)
+    - Add payment Method (completed)
+    - Add review payment page (completed)
+    - Add check-complete page (completed)
+- Add dashboard page (completed)
+    - Profile page (completed)
+    - My addresses page (completed)
+    - All orders (completed)
+    - View orders modal (completed)
+    - Wishlist page (completed)
+- Put an ng-if on the logout option.
+- Figure out what is guna be on the navbar and create them (completed)
+
+- Create a new user on the api through the app.
+- connect the bootsrap to the marketio api
+- bring the product list to show in the controller
+- get the data to show in the html
+- Make the product category to have its own controller. 
+- make the data show on page load
+- put an ng-repeat on the products to show so that it loads all of the products up
+
+add links (completed)
