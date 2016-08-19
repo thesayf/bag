@@ -8,38 +8,77 @@ var marketcloud = new Marketcloud.Client({
     })
 
 module.exports = function(app, models, Marketcloud) {
-    
-    marketcloud.products.getById(70938)
-        .then(function(product){   
+
+    /*marketcloud.products.getById(70938)
+        .then(function(product){
 //        console.log(product)
-        // Your code here          
-        });
-    
-    
-    app.post("/api/singleProduct", function (req, res){
-        console.log("this is fizzing");        
-              console.log(req.body.data);
-        marketcloud.products.getById(req.body.data)
-            .then(function(product){    
-              // Your code here 
+        // Your code here
+    });*/
+
+    app.post("/api/get-product-from-url", function (req, res){
+        var query = {
+            url: req.body.productName,
+            q: req.body.productName
+        };
+        marketcloud.products.list(query).then(function(products){
+            for(prod in products) {
+                console.log(req.body.productName+' = '+ products[prod].url);
+                if(products[prod].url == req.body.productName) {
+                    products = products[prod];
+                    //console.log('in: '+ products[prod].url);
+                }
+            }
+            return res.json({
+                success: true,
+                message: 'product',
+                data: products
+            });      // Your code here
+        })
+    })
+
+
+    app.post("/api/get-categories", function (req, res){
+        /*marketcloud.products.getById(req.body.data)
+            .then(function(product){
+              // Your code here
                 return res.json({
                             success: true,
                             message: 'product',
                             data: product
                         });
             console.log(product);
-        });
-    
+        });*/
+
+        marketcloud.categories.list({}).then(function(data){
+            res.json({
+                success: true,
+                message: 'categories',
+                data: data
+            });
+        })
+
     })
-    
-    
+
+    app.post("/api/get-category-products", function (req, res){
+        var query = {category_id : req.body.categoryID};
+        marketcloud.products.list(query).then(function(products){
+            console.log(products);
+            res.json({
+                success: true,
+                message: 'category-products',
+                data: products
+            });
+        })
+    })
+
+
     app.post("/api/bags", function (req, res){
         console.log("this is firing");
-        
+
         var query = {category_id : 70939}
-        
+
         marketcloud.products.list(query).then(function(data){
-            
+
             if(data){
 //                console.log(data)
                 console.log("this is working")
@@ -51,18 +90,18 @@ module.exports = function(app, models, Marketcloud) {
             }
             else{
                 console.log("no info")
-            
+
             }
             }).catch(function(error){
         //Handle error
             console.log(error)
         })
-        
-              
-        
-    
+
+
+
+
     })
-    
+
 	app.post('/api/member/signup', function(req, res) {
 		func.checkDuplicate(models.User, 'email', req.body.email, function(duplicateStatus) {
 			if(duplicateStatus == false) {
@@ -84,8 +123,8 @@ module.exports = function(app, models, Marketcloud) {
 					   func.sendInfo(res, recordStatus,
 						{data: token, errMessage: 'Account match!.'});
                                 // Your code here
-                    })     
-                    
+                    })
+
 				})
 			}
 		})
@@ -123,5 +162,8 @@ module.exports = function(app, models, Marketcloud) {
 	app.get('*', function(req, res) {
         res.render('pages/index');
     });
+
+
+
 
 }; // End Routes

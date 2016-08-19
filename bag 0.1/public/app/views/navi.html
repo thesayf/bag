@@ -93,19 +93,17 @@
             <ul class="nav navbar-nav navbar-right">
               <li class="active"><a ng-href="/">Home</a></li>
               <li class="dropdown megaDropMenu">
-                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="300" data-close-others="true" aria-expanded="false">Bags</b></a>
+                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="300" data-close-others="true" aria-expanded="false">Categories</b></a>
                 <ul class="dropdown-menu row">
                   <li class="col-sm-3 col-xs-12">
                     <ul class="list-unstyled">
                       <li>Products Grid View</li>
-                      <li><a ng-click="bags()" ng-href="/product-page">bags</a></li>
-                      <li><a ng-href="/product-page">Products Sidebar Right</a></li>
-                      <li><a ng-href="/product-page">Products 3 Columns V1</a></li>
-                      <li><a ng-href="/product-page">Products 3 Columns V2</a></li>
-                      <li><a ng-href="/product-page">Products 4 Columns</a></li>
+                      <li ng-repeat="cat in categoryList">
+                          <a href="/{{cat.name}}">{{cat.name}}</a>
+                      </li>
                     </ul>
                   </li>
-                  <li class="col-sm-3 col-xs-12">
+                  <!-- <li class="col-sm-3 col-xs-12">
                     <ul class="list-unstyled">
                       <li>Products List View</li>
                       <li><a ng-href="/product-page">Products Sidebar Left</a></li>
@@ -127,7 +125,7 @@
                   </li>
                   <li class="col-sm-3 col-xs-12">
                     <a ng-href="/single-product" class="menu-photo"><img src="img/menu-photo.jpg" alt="menu-img"></a>
-                  </li>
+                </li>-->
                 </ul>
               </li>
               <li class="dropdown megaDropMenu">

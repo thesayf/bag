@@ -12,11 +12,43 @@ app.factory('alerts', function() {
     }
 })
 
-app.factory('product', function() {
-    return {
-        price: '',
-        id: '',
+app.factory('productList', function() {
+    return {};
+})
+
+app.factory('categoryList', function() {
+    return {};
+})
+
+app.service('category', function($http, categoryList) {
+    var category = {};
+
+    category.getCategories = function(callback) {
+        $http.post('/api/get-categories').then(function(resp) {
+            categoryList = resp.data.data;
+            callback(categoryList);
+        });
     }
+
+    return category;
+})
+
+app.service('product', function($http) {
+    var product = {};
+
+    product.getCategoryProduct = function(categoryID, callback) {
+        $http.post('/api/get-category-products', {categoryID}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    product.getProductFromUrl = function(productName, callback) {
+        $http.post('/api/get-product-from-url', {productName}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    return product;
 })
 
 
@@ -112,6 +144,22 @@ app.service('hacks', function($location) {
     }
     return hacks;
 })
+
+app.service('func', function() {
+    var func = {};
+
+    func.seoUrl = function(text) {
+        return text.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+    }
+
+    func.htmlToPlaintext = function(text) {
+        return text ? String(text).replace(/<[^>]+>/gm, '') : '';
+    }
+
+    return func;
+})
+
+
 
 app.service('customjs', function() {
     var customjs = {};
