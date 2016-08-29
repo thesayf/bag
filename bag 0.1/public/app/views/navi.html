@@ -37,35 +37,11 @@
                   </ul>
                 </li>
                 <li class="dropdown">
-                  <a href="cart-page.html" class="dropdown-toggle" data-toggle="dropdown disabled"><i class="fa fa-shopping-cart"></i>$0</a>
+                  <a href="/cart" class="dropdown-toggle" data-toggle="dropdown disabled">
+                      <i class="fa fa-shopping-cart"></i>{{prices.subTotal}}
+                  </a>
                   <ul class="dropdown-menu dropdown-menu-right">
-                    <li>Item(s) in your cart</li>
-                    <li>
-                      <a ng-href="/single-product">
-                        <div class="media">
-                          <img class="media-left media-object" src="img/home/cart-items/cart-item-01.jpg" alt="cart-Image">
-                          <div class="media-body">
-                            <h5 class="media-heading">INCIDIDUNT UT <br><span>2 X $199</span></h5>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li>
-                      <a ng-href="/single-product">
-                        <div class="media">
-                          <img class="media-left media-object" src="img/home/cart-items/cart-item-01.jpg" alt="cart-Image">
-                          <div class="media-body">
-                            <h5 class="media-heading">INCIDIDUNT UT <br><span>2 X $199</span></h5>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="btn-group" role="group" aria-label="...">
-                        <button type="button" class="btn btn-default" onclick="location.href='/cart-page';">Shopping Cart</button>
-                        <button type="button" class="btn btn-default" onclick="location.href='/checkout-step-1';">Checkout</button>
-                      </div>
-                    </li>
+                      <div mini-cart></div>
                   </ul>
                 </li>
               </ul>

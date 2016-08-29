@@ -21,3 +21,10 @@ app.directive('foot', function() {
 		controller: 'HomeCtrl',
 	}
 })
+
+app.directive('miniCart', function() {
+	return {
+		templateUrl: dir+'cart/mini-cart.html',
+		controller: 'CartCtrl',
+	}
+})

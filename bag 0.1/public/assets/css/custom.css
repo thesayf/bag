@@ -6,6 +6,8 @@
     padding-left: 25px !important;
     padding-right: 25px !important;
 }
+.va-top {vertical-align: top;}
+.qty-box {width: 65px; height: 39px;}
 
 #splash {
     background: url(../img/splash1.jpg);

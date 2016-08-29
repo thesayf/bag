@@ -60,16 +60,14 @@
                       <option value="3">Big</option>
                     </select>
                   </span>
-                  <span class="quick-drop resizeWidth">
-                    <select name="guiest_id4" id="guiest_id4" class="select-drop">
+                  <span class="quick-drop resizeWidth va-top">
+                    <select ng-model="qty" name="guiest_id4" id="guiest_id4" class="qty-box">
                       <option value="0">Qty</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
+                      <option ng-repeat="stock in stockLevelArr" value="{{stock}}">{{stock}}</option>
                     </select>
                   </span>
                   <div class="btn-area">
-                    <a ng-click="test()" class="btn btn-primary btn-block">Add to cart <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                    <a ng-click="addToCart(single.id, qty)" class="btn btn-primary btn-block">Add to cart <i class="fa fa-angle-right" aria-hidden="true"></i></a>
                   </div>
                   <div class="tabArea">
                     <ul class="nav nav-tabs">

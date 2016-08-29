@@ -1,0 +1,18 @@
+
+    <li>Item(s) in your cart</li>
+    <li ng-repeat="item in cart.items">
+      <a href="" ng-click="goToProductPage(item.category_id, item.url)">
+        <div class="media">
+          <img width="70" class="media-left media-object" src="{{item.images[0]}}" alt="cart-Image">
+          <div class="media-body">
+            <h5 class="media-heading">{{item.name}}<br><span>{{item.quantity}} X {{prices.currency}}{{item.price}}</span></h5>
+          </div>
+        </div>
+      </a>
+    </li>
+    <li>
+      <div class="btn-group" role="group" aria-label="...">
+        <button type="button" class="btn btn-default" onclick="location.href='/cart';">Shopping Cart</button>
+        <button type="button" class="btn btn-default" onclick="location.href='/checkout-step-1';">Checkout</button>
+      </div>
+    </li>

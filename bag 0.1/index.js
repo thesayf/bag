@@ -2,7 +2,16 @@
 var express         = require('express');
 var app             = express();
 var bodyParser      = require('body-parser');
+
+var jwt = require('jsonwebtoken');
+var jwtSecret 	= 'jwtSecretKey';
+
 var Marketcloud = require('marketcloud-node');
+var marketcloud = new Marketcloud.Client({
+    public_key : '4eb1bcc1-677c-40ec-bda0-aa784219c0cc',
+    secret_key : '058G6A9xGv4VAj+GRlybSwOKnwW0IT4SpndC4HzFeF0='
+})
+
 // DB
 var mongoose        = require('mongoose');
 // DB Collection
@@ -14,6 +23,14 @@ mongoose.connect(configDB.url);
 
 var models = {};
 models.User = User;
+
+var cont = {};
+cont.func = require('./server/controllers/func.js');
+
+var libs = {};
+libs.jwt = jwt;
+libs.jwtSecret = jwtSecret;
+libs.marketcloud = marketcloud;
 
 // Set Port
 app.set('port', (process.env.PORT || 5002));
@@ -31,7 +48,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 // routes
-require(__dirname + '/server/routes')(app, models, Marketcloud);
+require(__dirname + '/server/routes')(app, models, cont, libs);
 
 app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));

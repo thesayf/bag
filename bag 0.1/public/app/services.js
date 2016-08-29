@@ -12,6 +12,17 @@ app.factory('alerts', function() {
     }
 })
 
+app.factory('prices', function() {
+    var prices = {};
+    prices.decimalPlace = 2;
+    prices.currency = '£';
+    prices.subTotal = 0;
+    prices.vatPercent = 20;
+    prices.vat = 0;
+    prices.grandTotal = 0;
+    return prices;
+})
+
 app.factory('productList', function() {
     return {};
 })
@@ -29,6 +40,8 @@ app.service('category', function($http, categoryList) {
             callback(categoryList);
         });
     }
+
+    category.currentCategoryName = '';
 
     return category;
 })
@@ -49,6 +62,40 @@ app.service('product', function($http) {
     }
 
     return product;
+})
+
+app.service('cart', function($http, $localStorage) {
+    var cart = {};
+    if($localStorage.cart) {
+        var cartID = $localStorage.cart.id
+    } else {
+        cartID = '';
+    }
+    cart.addToCart = function(product, qty, callback) {
+        $http.post('/api/add-to-cart', {product: product, qty: parseInt(qty), cartID: cartID}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    cart.loadRemoteCart = function(cartID, callback) {
+        $http.post('/api/get-cart', {cartID: cartID}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    cart.removeItem = function(cartID, productID, callback) {
+        $http.post('/api/remove-cart-item', {cartID: cartID, productID: productID}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    cart.updateItems = function(cartID, updateArr, callback) {
+        $http.post('/api/update-items', {cartID: cartID, updateArr: updateArr}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    return cart;
 })
 
 

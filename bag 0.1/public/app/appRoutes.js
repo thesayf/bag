@@ -9,6 +9,11 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
         controller  : 'HomeCtrl'
     })
 
+    .when('/cart', {
+        templateUrl : viewDir+'cart/cart-page.html',
+        controller  : 'CartCtrl'
+    })
+
     .when('/:categoryName', {
         templateUrl : viewDir+'category/category-page.html',
         controller  : 'CategoryCtrl'

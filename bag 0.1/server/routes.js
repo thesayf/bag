@@ -1,26 +1,11 @@
-var func = require(__dirname + '/controllers/func.js');
-var jwt = require('jsonwebtoken');
-var jwtSecret 	= 'jwtSecretKey';
-var Marketcloud = require('marketcloud-node');
-var marketcloud = new Marketcloud.Client({
-        public_key : '4eb1bcc1-677c-40ec-bda0-aa784219c0cc',
-        secret_key : '058G6A9xGv4VAj+GRlybSwOKnwW0IT4SpndC4HzFeF0='
-    })
-
-module.exports = function(app, models, Marketcloud) {
-
-    /*marketcloud.products.getById(70938)
-        .then(function(product){
-//        console.log(product)
-        // Your code here
-    });*/
+module.exports = function(app, models, cont, libs) {
 
     app.post("/api/get-product-from-url", function (req, res){
         var query = {
             url: req.body.productName,
             q: req.body.productName
         };
-        marketcloud.products.list(query).then(function(products){
+        libs.marketcloud.products.list(query).then(function(products){
             for(prod in products) {
                 console.log(req.body.productName+' = '+ products[prod].url);
                 if(products[prod].url == req.body.productName) {
@@ -36,32 +21,19 @@ module.exports = function(app, models, Marketcloud) {
         })
     })
 
-
     app.post("/api/get-categories", function (req, res){
-        /*marketcloud.products.getById(req.body.data)
-            .then(function(product){
-              // Your code here
-                return res.json({
-                            success: true,
-                            message: 'product',
-                            data: product
-                        });
-            console.log(product);
-        });*/
-
-        marketcloud.categories.list({}).then(function(data){
+        libs.marketcloud.categories.list({}).then(function(data){
             res.json({
                 success: true,
                 message: 'categories',
                 data: data
             });
         })
-
     })
 
     app.post("/api/get-category-products", function (req, res){
         var query = {category_id : req.body.categoryID};
-        marketcloud.products.list(query).then(function(products){
+        libs.marketcloud.products.list(query).then(function(products){
             console.log(products);
             res.json({
                 success: true,
@@ -71,76 +43,93 @@ module.exports = function(app, models, Marketcloud) {
         })
     })
 
+    app.post('/api/add-to-cart', function(req, res) {
+        console.log(req.body);
+        if(req.body.cartID !== '') {
+            console.log('here');
+            libs.marketcloud.carts.add(req.body.cartID,[
+                {'product_id':req.body.product, 'quantity':req.body.qty}])
+            .then(function(data){
+                if(data) {
+                    cont.func.sendInfo(res, true, {data: data, message: 'Item Added.'});
+                } else {
+                    cont.func.sendInfo(res, false, {errMessage: 'No cart'});
+                }
+            })
+        } else {
+            libs.marketcloud.carts.create({
+                items:[{'product_id':req.body.product, 'quantity':req.body.qty}]
+            }).then(function(data){
+                if(data) {
+                    cont.func.sendInfo(res, true, {data: data, message: 'Item Added.'});
+                } else {
+                    cont.func.sendInfo(res, false, {errMessage: 'No cart'});
+                }
+            })
+        }
+    })
 
-    app.post("/api/bags", function (req, res){
-        console.log("this is firing");
-
-        var query = {category_id : 70939}
-
-        marketcloud.products.list(query).then(function(data){
-
-            if(data){
-//                console.log(data)
-                console.log("this is working")
-                return res.json({
-                            success: true,
-                            message: 'products',
-                            data: data
-                        });
+    app.post('/api/get-cart', function(req, res) {
+        libs.marketcloud.carts.getById(req.body.cartID).then(function(data){
+            if(data) {
+                cont.func.sendInfo(res, true, {data: data, message: 'Got Cart.'});
+            } else {
+                cont.func.sendInfo(res, false, {errMessage: 'No cart'});
             }
-            else{
-                console.log("no info")
-
-            }
-            }).catch(function(error){
-        //Handle error
-            console.log(error)
         })
+    })
 
+    app.post('/api/remove-cart-item', function(req, res) {
+        libs.marketcloud.carts.remove(req.body.cartID,[{'product_id':req.body.productID}]).then(function(data){
+            if(data) {
+                cont.func.sendInfo(res, true, {data: data, message: 'Removed Item.'});
+            } else {
+                cont.func.sendInfo(res, false, {errMessage: 'Problem Removing Item.'});
+            }
+        })
+    })
 
-
-
+    app.post('/api/update-items', function(req, res) {
+        libs.marketcloud.carts.update(req.body.cartID, req.body.updateArr).then(function(data){
+            if(data) {
+                cont.func.sendInfo(res, true, {data: data, message: 'Updated Item.'});
+            } else {
+                cont.func.sendInfo(res, false, {errMessage: 'Problem Updting Item.'});
+            }
+        })
     })
 
 	app.post('/api/member/signup', function(req, res) {
 		func.checkDuplicate(models.User, 'email', req.body.email, function(duplicateStatus) {
 			if(duplicateStatus == false) {
 				// there's a duplicate
-				func.sendInfo(res, duplicateStatus,
+				cont.func.sendInfo(res, duplicateStatus,
 					{errMessage: 'This Emails already signed up. Login or reset password.'});
 			} else {
 				// No duplicate in mongo so add record
-				func.addRecord(models.User, req.body, function(recordStatus) {
-                    marketcloud.users.create({
+				cont.func.addRecord(models.User, req.body, function(recordStatus) {
+                    libs.marketcloud.users.create({
                         name: req.body.fName,
                         email: req.body.email,
                         password : req.body.password,
+                    }).then(function(data){
+					   var token = libs.jwt.sign(req.body.email, libs.jwtSecret);
+					   cont.func.sendInfo(res, recordStatus, {data: token, errMessage: 'Account match!.'});
                     })
-                        .then(function(data){
-                        console.log(data)
-                        console.log(req.body);
-					   var token = jwt.sign(req.body.email, jwtSecret);
-					   func.sendInfo(res, recordStatus,
-						{data: token, errMessage: 'Account match!.'});
-                                // Your code here
-                    })
-
 				})
 			}
 		})
 	});
 
 	app.post('/api/member/login', function(req, res) {
-		func.checkDuplicate(models.User, ['email', 'password'], [req.body.email, req.body.password], function(duplicateStatus) {
+		cont.func.checkDuplicate(models.User, ['email', 'password'], [req.body.email, req.body.password], function(duplicateStatus) {
 			if(duplicateStatus == false) {
 				// there's an account match
-				var token = jwt.sign(req.body.email, jwtSecret);
-				func.sendInfo(res, duplicateStatus,
-					{data: token, errMessage: 'Account match!.'});
+				var token = libs.jwt.sign(req.body.email, libs.jwtSecret);
+				cont.func.sendInfo(res, duplicateStatus, {data: token, errMessage: 'Account match!.'});
 			} else {
 				// No duplicate in mongo so no account matches
-				func.sendInfo(res, duplicateStatus,
-					{message: 'Email does not exist. Signup today!'});
+				cont.func.sendInfo(res, duplicateStatus, {message: 'Email does not exist. Signup today!'});
 			}
 		})
 	});
@@ -148,7 +137,7 @@ module.exports = function(app, models, Marketcloud) {
 	app.post('/api/member/check-token', function(req, res) {
 		var token = req.body.data;
 		if(token !== false) {
-			var decodedEmail = jwt.verify(token, jwtSecret);
+			var decodedEmail = libs.jwt.verify(token, libs.jwtSecret);
 			if(decodedEmail) {
 				res.json({status: true});
 			} else {
