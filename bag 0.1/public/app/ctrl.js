@@ -30,7 +30,6 @@ app.controller('CategoryCtrl', function($scope, $window, $location, $http, produ
 
 })
 
-
 app.controller('SingleProductCtrl', function($scope, $window, $location, $http, product, $routeParams, func, category, cart, $localStorage, ModalService) {
     $scope.qty = '0';
     $scope.stockLevel = '0';
@@ -137,7 +136,95 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
 
 })
 
+app.controller('CheckoutCtrl', function($scope) {
+    //
+})
 
+app.controller('AddressCtrl', function($scope, $location, addresses, addressList, $localStorage, billingInfo, shippingInfo) {
+    $scope.addresses = addresses;
+    $scope.addressList = addressList;
+    $scope.billingInfo = billingInfo;
+    $scope.shippingInfo = shippingInfo;
+    $scope.sameShippingAddress = true;
+    $scope.billingMatches = false;
+    $scope.shippingMatches = false;
+
+    if($localStorage.billingInfo) {
+        $scope.billingInfo = $localStorage.billingInfo;
+    }
+    if($localStorage.shippingInfo) {
+        $scope.shippingInfo = $localStorage.shippingInfo;
+    }
+    if($localStorage.sameShippingAddress == false) {
+        $scope.sameShippingAddress = $localStorage.sameShippingAddress;
+    }
+
+    $scope.saveAddress = function() {
+        $localStorage.sameShippingAddress = $scope.sameShippingAddress;
+        $localStorage.billingInfo = $scope.billingInfo;
+        for(key in $scope.addressList) {
+            if(angular.toJson($scope.billingInfo) === angular.toJson($scope.addressList[key])) {
+                $scope.billingMatches = true;
+            }
+        }
+
+        if($scope.sameShippingAddress == false) {
+            $localStorage.shippingInfo = $scope.shippingInfo;
+            for(key in $scope.addressList) {
+                if(angular.toJson($scope.shippingInfo) === angular.toJson($scope.addressList[key])) {
+                    $scope.shippingMatches = true;
+                }
+            }
+            if($scope.billingMatches == true && $scope.shippingMatches == true ) {
+                $location.path('/checkout-step-2');
+            } else {
+                if($scope.billingMatches == true) {
+                    var newAdd = $scope.shippingInfo;
+                } else {
+                    var newAdd = $scope.billingInfo;
+                }
+                addresses.saveAddress($localStorage.userID, newAdd, function(resp) {
+                    $location.path('/checkout-step-2');
+                })
+            }
+        } else {
+            if($scope.billingMatches == true) {
+                $location.path('/checkout-step-2');
+            }
+        }
+    }
+
+    $scope.deleteAddress = function(key) {
+        addresses.deleteAddress(key, function(resp) {
+            if(resp.data.success == true) {
+                $scope.addressList = resp.data.data.addresses;
+            }
+        })
+    }
+
+    $scope.populateBilling = function($index) {
+        $scope.billingInfo = $scope.addressList[$index];
+        $scope.populated = true;
+    }
+    $scope.populateShipping = function($index) {
+        $scope.shippingInfo = $scope.addressList[$index];
+        $scope.shippingPopulated = true;
+    }
+
+    if($location.path() == '/account-address' || $location.path() == '/checkout-step-1') {
+        addresses.getAddresses(function(resp) {
+            console.log(resp.data.data[0].addresses);
+            if(resp.data.data[0].addresses.length < 1) {
+                // no addresses
+                addresses.hasAddress = false;
+            } else {
+                addresses.hasAddress = true;
+                $scope.addressList = resp.data.data[0].addresses;
+            }
+        })
+    }
+
+})
 
 app.controller('NaviCtrl', function($scope, details, member, customjs, $http, product, category, categoryList) {
     $scope.details = details;
@@ -148,28 +235,7 @@ app.controller('NaviCtrl', function($scope, details, member, customjs, $http, pr
     $scope.logout = function() {
         member.logout();
     }
-
-    $scope.bags = function() {
-
-    console.log("this is firing")
-    $http.post('/api/bags', $scope.driver).success(function(response) {
-        console.log("we added the stuff");
-        console.log(response);
-        console.log(response.data[0]["price"]);
-
-        $scope.product = response.data;
-
-        $scope.price = response.data[0]["price"]
-
-
-        });
-
-    }
-
-
 })
-
-
 
 app.controller('MemberCtrl', function($scope, $http, $location, auth, member, alerts) {
     $scope.signupData = {};
@@ -195,11 +261,8 @@ app.controller('MemberCtrl', function($scope, $http, $location, auth, member, al
             })
         })
     }
-
 })
 
 app.controller('ModalController', function($scope, close) {
-
-  // when you need to close the modal, call close
-  close("Success!");
+    close("Success!");
 });

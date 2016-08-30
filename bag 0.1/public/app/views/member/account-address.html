@@ -1,4 +1,4 @@
-<div navi></div> 
+<div navi></div>
 
 <!-- LIGHT SECTION -->
       <section class="lightSection clearfix pageHeader">
@@ -20,7 +20,7 @@
           </div>
         </div>
       </section>
-      
+
       <!-- MAIN CONTENT SECTION -->
       <section class="mainContent clearfix userProfile">
         <div class="container">
@@ -38,13 +38,12 @@
           <div class="row">
             <div class="col-xs-12">
               <div class="innerWrapper">
-                <div class="orderBox myAddress">
+                <div ng-if="addresses.hasAddress == true" class="orderBox myAddress">
                   <h4>My Address</h4>
                   <div class="table-responsive">
                     <table class="table">
                       <thead>
                         <tr>
-                          <th>Company</th>
                           <th>Name</th>
                           <th>Address</th>
                           <th>Country</th>
@@ -53,42 +52,14 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>Nokia</td>
-                          <td>Adam Smith</td>
-                          <td>9/4 C Babor Road, Mohammad Pur, Dhaka</td>
-                          <td>Bangladesh</td>
-                          <td>+884 5452 6452</td>
+                        <tr ng-repeat="add in addressList">
+                          <td>{{add.fullName}}</td>
+                          <td>{{add.address1}} {{add.city}} {{add.postalCode}}</td>
+                          <td>{{add.country}}</td>
+                          <td>{{add.phoneNumber}}</td>
                           <td>
                             <div class="btn-group" role="group">
-                              <button type="button" class="btn btn-default"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                              <button type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Samsung</td>
-                          <td>Adam Smith</td>
-                          <td>9/4 C Babor Road, Mohammad Pur, Dhaka</td>
-                          <td>Bangladesh</td>
-                          <td>+884 5452 6452</td>
-                          <td>
-                            <div class="btn-group" role="group">
-                              <button type="button" class="btn btn-default"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                              <button type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Motorola</td>
-                          <td>Adam Smith</td>
-                          <td>9/4 C Babor Road, Mohammad Pur, Dhaka</td>
-                          <td>Bangladesh</td>
-                          <td>+884 5452 6452</td>
-                          <td>
-                            <div class="btn-group" role="group">
-                              <button type="button" class="btn btn-default"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                              <button type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
+                              <button ng-click="deleteAddress($index)" type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
                             </div>
                           </td>
                         </tr>
@@ -96,6 +67,11 @@
                     </table>
                   </div>
                 </div>
+
+                <div ng-if="addresses.hasAddress == false" class="orderBox myAddress">
+                    <h4>No Addresses</h4>
+                </div>
+
               </div>
             </div>
           </div>

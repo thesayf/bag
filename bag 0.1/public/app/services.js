@@ -23,6 +23,34 @@ app.factory('prices', function() {
     return prices;
 })
 
+app.factory('billingInfo', function() {
+    return {
+        fullName: '',
+        email: '',
+        address1 : '',
+        phoneNumber: '',
+        city: '',
+        postalCode: '',
+        country: 'United Kingdom'
+    }
+})
+
+app.factory('shippingInfo', function() {
+    return {
+        fullName: '',
+        email: '',
+        address1 : '',
+        phoneNumber: '',
+        city: '',
+        postalCode: '',
+        country: 'United Kingdom'
+    }
+})
+
+app.factory('addressList', function() {
+    return {};
+})
+
 app.factory('productList', function() {
     return {};
 })
@@ -98,6 +126,37 @@ app.service('cart', function($http, $localStorage) {
     return cart;
 })
 
+app.service('checkout', function($http, $localStorage) {
+    var checkout = {};
+
+    return checkout;
+})
+
+app.service('addresses', function($http, $localStorage) {
+    var addresses = {};
+
+    addresses.hasAddress = false;
+
+    addresses.getAddresses = function(callback) {
+        $http.post('/api/get-addresses', {userID: $localStorage.userID}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    addresses.deleteAddress = function(key, callback) {
+        $http.post('/api/delete-address', {userID: $localStorage.userID, key: key}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    addresses.saveAddress = function(userID, address, callback) {
+        $http.post('/api/add-address', {userID: userID, address: address}).then(function(resp) {
+            callback(resp);
+        });
+    }
+
+    return addresses;
+})
 
 app.service('member', function($localStorage, $location, $http, auth, details, alerts) {
     var member = {};
@@ -110,11 +169,15 @@ app.service('member', function($localStorage, $location, $http, auth, details, a
 
     member.signup = function(signupData, callback) {
         $http.post('/api/member/signup', signupData).then(function(response) {
+            console.log(response);
             if(response.data.success == false) {
                 $('#signup-alert').show();
             } else {
-                $location.path('/account-dashboard');
-                details.loggedIn = true;
+                auth.saveStorageField('token', response.data.data.token, function(resp) {
+                    $localStorage.userID = response.data.data.id;
+                    $location.path('/account-dashboard');
+                    details.loggedIn = true;
+                })
             }
         })
     }

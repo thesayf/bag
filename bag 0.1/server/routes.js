@@ -99,24 +99,56 @@ module.exports = function(app, models, cont, libs) {
         })
     })
 
+    app.post('/api/get-addresses', function(req, res) {
+        cont.func.getAddresses(models.User, {userID: req.body.userID}, function(data) {
+            if(data) {
+                cont.func.sendInfo(res, true, {data: data, message: 'Updated Item.'});
+            } else {
+                cont.func.sendInfo(res, false, {errMessage: 'Problem Updting Item.'});
+            }
+        })
+    })
+
+    app.post('/api/add-address', function(req, res) {
+        cont.func.updateArray(models.User, {'userID': req.body.userID}, {key: 'addresses', value: req.body.address}, function(recordStatus) {
+            console.log(recordStatus);
+        })
+    })
+
+    app.post('/api/delete-address', function(req, res) {
+        cont.func.deleteAddress(models.User, {'userID': req.body.userID}, req.body.key, function(recordStatus) {
+            console.log(recordStatus);
+            if(recordStatus) {
+                cont.func.sendInfo(res, true, {data: recordStatus, message: 'Address Deleted!'});
+            } else {
+                cont.func.sendInfo(res, false, {errMessage: 'Address Not Deleted!'});
+            }
+        })
+    })
+
 	app.post('/api/member/signup', function(req, res) {
-		func.checkDuplicate(models.User, 'email', req.body.email, function(duplicateStatus) {
+		cont.func.checkDuplicate(models.User, 'email', req.body.email, function(duplicateStatus) {
 			if(duplicateStatus == false) {
 				// there's a duplicate
 				cont.func.sendInfo(res, duplicateStatus,
 					{errMessage: 'This Emails already signed up. Login or reset password.'});
 			} else {
 				// No duplicate in mongo so add record
-				cont.func.addRecord(models.User, req.body, function(recordStatus) {
-                    libs.marketcloud.users.create({
-                        name: req.body.fName,
-                        email: req.body.email,
-                        password : req.body.password,
-                    }).then(function(data){
-					   var token = libs.jwt.sign(req.body.email, libs.jwtSecret);
-					   cont.func.sendInfo(res, recordStatus, {data: token, errMessage: 'Account match!.'});
+                libs.marketcloud.users.create({
+                    name: req.body.fName,
+                    email: req.body.email,
+                    password : req.body.password,
+                }).then(function(data){
+                    req.body.userID = data.id;
+                    cont.func.addRecord(models.User, req.body, function(recordStatus) {
+	                    var token = libs.jwt.sign(req.body.email, libs.jwtSecret);
+                        if(recordStatus) {
+                            cont.func.sendInfo(res, true, {data: {token: token, id: data.id}, errMessage: 'Account match!.'});
+                        } else {
+                            cont.func.sendInfo(res, false, {errMessage: 'Problem signing up'});
+                        }
                     })
-				})
+                })
 			}
 		})
 	});

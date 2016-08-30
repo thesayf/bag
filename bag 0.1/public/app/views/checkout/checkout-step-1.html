@@ -21,7 +21,7 @@
           </div>
         </div>
       </section>
-      
+
       <!-- MAIN CONTENT SECTION -->
       <section class="mainContent clearfix stepsWrapper">
         <div class="container">
@@ -54,56 +54,48 @@
                     <a href="checkout-step-4.html" class="progress-wizard-dot"></a>
                   </div>
                 </div>
-                
+
                 <form action="" class="row" method="POST" role="form">
                   <div class="col-xs-12">
                     <div class="page-header">
                       <h4>Billing information</h4>
                     </div>
                   </div>
-                  <div class="form-group col-sm-6 col-xs-12">
-                    <label for="">First Name</label>
-                    <input type="text" class="form-control" id="">
+                  <div ng-if="addresses.hasAddress == true" class="form-group col-sm-12 col-xs-12">
+                      <p>Use existing address:
+                          <select class="form-control">
+                              <option selected disabled>Choose Address</option>
+                              <option ng-repeat="add in addressList" ng-click="populateBilling($index)">{{add.address1}} {{add.city}} {{add.postalCode}} {{add.country}}</option>
+                          </select>
+                      </p>
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
-                    <label for="">Last Name</label>
-                    <input type="text" class="form-control" id="">
+                    <label for="">Full Name</label>
+                    <input ng-model="billingInfo.fullName" type="text" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Email</label>
-                    <input type="email" class="form-control" id="">
-                  </div>
-                  <div class="form-group col-sm-6 col-xs-12">
-                    <label for="">Company</label>
-                    <input type="text" class="form-control" id="">
+                    <input ng-model="billingInfo.email" type="email" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Address</label>
-                    <input type="text" class="form-control" id="">
+                    <input ng-model="billingInfo.address1" type="text" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Phone</label>
-                    <input type="text" class="form-control" id="">
+                    <input ng-model="billingInfo.phoneNumber" type="text" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">City</label>
-                    <input type="text" class="form-control" id="">
+                    <input ng-model="billingInfo.city" type="text" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Zip Code</label>
-                    <input type="text" class="form-control" id="">
+                    <input ng-model="billingInfo.postalCode" type="text" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Country</label>
-                    <input type="text" class="form-control" id="">
-                  </div>
-                  <div class="form-group col-sm-6 col-xs-12">
-                    <label for="">Fax</label>
-                    <input type="text" class="form-control" id="">
-                  </div>
-                  <div class="form-group col-sm-6 col-xs-12">
-                    <label for="">First Name</label>
-                    <textarea class="form-control"></textarea>
+                    <input disabled ng-model="billingInfo.country" type="text" class="form-control" id="">
                   </div>
                   <div class="col-xs-12">
                     <div class="page-header">
@@ -111,14 +103,53 @@
                     </div>
                   </div>
                   <div class="col-xs-12 checkboxArea">
-                    <input id="checkbox1" type="checkbox" name="checkbox" value="1" checked="checked">
+                    <input id="checkbox1" ng-model="sameShippingAddress" type="checkbox" name="checkbox" value="1" checked="checked">
                     <label for="checkbox1"><span></span>Same as billing Information </label>
                   </div>
+                  <div ng-if="sameShippingAddress == false">
+                      <div ng-if="addresses.hasAddress == true" class="form-group col-sm-12 col-xs-12">
+                          <p>Use existing address:
+                              <select class="form-control">
+                                  <option selected disabled>Choose Address</option>
+                                  <option ng-repeat="add in addressList" ng-click="populateShipping($index)">{{add.address1}} {{add.city}} {{add.postalCode}} {{add.country}}</option>
+                              </select>
+                          </p>
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">Full Name</label>
+                        <input ng-model="shippingInfo.fullName" type="text" class="form-control" id="">
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">Email</label>
+                        <input ng-model="shippingInfo.email" type="email" class="form-control" id="">
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">Address</label>
+                        <input ng-model="shippingInfo.address1" type="text" class="form-control" id="">
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">Phone</label>
+                        <input ng-model="shippingInfo.phoneNumber" type="text" class="form-control" id="">
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">City</label>
+                        <input ng-model="shippingInfo.city" type="text" class="form-control" id="">
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">Zip Code</label>
+                        <input ng-model="shippingInfo.postalCode" type="text" class="form-control" id="">
+                      </div>
+                      <div class="form-group col-sm-6 col-xs-12">
+                        <label for="">Country</label>
+                        <input disabled ng-model="shippingInfo.country" type="text" class="form-control" id="">
+                      </div>
+                  </div>
+
                   <div class="col-xs-12">
                     <div class="well well-lg clearfix">
                       <ul class="pager">
-                      <li class="previous"><a href="#" class="hideContent">back</a></li>
-                        <li class="next"><a href="checkout-step-2.html">Continue</a></li>
+                      <li class="previous"><a href="/cart" class="hideContent">back</a></li>
+                        <li class="next"><a href="#" ng-click="saveAddress()">Continue</a></li>
                       </ul>
                     </div>
                   </div>

@@ -6,6 +6,8 @@ var userSchema = mongoose.Schema({
     lName: String,
     email: String,
     password: String,
+    userID: Number,
+    addresses: []
 });
 
 // create the model for users and expose it to our app
