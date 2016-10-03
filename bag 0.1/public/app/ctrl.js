@@ -341,7 +341,12 @@ app.controller('NaviCtrl', function($scope, details, member, customjs, $http, pr
         }
     }
 
-    $scope.updatePrices($localStorage.cart.items);
+    if($localStorage.cart) {
+        if($localStorage.cart.items) {
+            $scope.updatePrices($localStorage.cart.items);
+        }
+    }
+
 
     if($localStorage.categoryList) {
         $scope.categoryList = $localStorage.categoryList;
