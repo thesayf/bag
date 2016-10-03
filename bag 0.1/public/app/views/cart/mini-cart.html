@@ -3,15 +3,26 @@
     <li ng-repeat="item in cart.items">
       <a href="" ng-click="goToProductPage(item.category_id, item.url)">
         <div class="media">
-          <img width="70" class="media-left media-object" src="{{item.images[0]}}" alt="cart-Image">
+          <img width="70" class="media-left media-object" src="{{item.product.images[0].file.url}}" alt="cart-Image">
           <div class="media-body">
-            <h5 class="media-heading">{{item.name}}<br><span>{{item.quantity}} X {{prices.currency}}{{item.price}}</span></h5>
+            <h5 class="media-heading">{{item.product.name}}<br><span>{{item.quantity}} X {{prices.currency}}{{item.price}}</span></h5>
           </div>
         </div>
       </a>
     </li>
     <li>
+        <ul class="list-unstyled">
+          <li>Sub Total <span>{{prices.currency}}{{prices.subTotal}}</span></li>
+        </ul>
+        <ul class="list-unstyled">
+            <li>UK Vat <span>{{prices.currency}}{{prices.vat}}</span></li><br>
+        </ul>
+        <ul class="list-unstyled">
+            <li>Grand Total <span class="grandTotal">{{prices.currency}}{{prices.grandTotal}}</span></li>
+        </ul>
+
       <div class="btn-group" role="group" aria-label="...">
+
         <button type="button" class="btn btn-default" onclick="location.href='/cart';">Shopping Cart</button>
         <button type="button" class="btn btn-default" onclick="location.href='/checkout-step-1';">Checkout</button>
       </div>

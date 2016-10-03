@@ -64,8 +64,8 @@ app.service('category', function($http, categoryList) {
 
     category.getCategories = function(callback) {
         $http.post('/api/get-categories').then(function(resp) {
-            categoryList = resp.data.data;
-            callback(categoryList);
+            categoryList = $.parseJSON(resp.data.data);
+            callback(categoryList.results);
         });
     }
 
@@ -79,13 +79,13 @@ app.service('product', function($http) {
 
     product.getCategoryProduct = function(categoryID, callback) {
         $http.post('/api/get-category-products', {categoryID}).then(function(resp) {
-            callback(resp);
+            callback($.parseJSON(resp.data.data));
         });
     }
 
     product.getProductFromUrl = function(productName, callback) {
         $http.post('/api/get-product-from-url', {productName}).then(function(resp) {
-            callback(resp);
+            callback($.parseJSON(resp.data.data));
         });
     }
 
@@ -99,7 +99,14 @@ app.service('cart', function($http, $localStorage) {
     } else {
         cartID = '';
     }
-    cart.addToCart = function(product, qty, callback) {
+
+    cart.createCart = function(callback) {
+        $http.post('/api/create-cart', {cartID: cartID}).then(function(resp) {
+            callback(resp.data);
+        });
+    }
+
+    cart.addToCart = function(product, qty, cartID, callback) {
         $http.post('/api/add-to-cart', {product: product, qty: parseInt(qty), cartID: cartID}).then(function(resp) {
             callback(resp);
         });
@@ -126,8 +133,28 @@ app.service('cart', function($http, $localStorage) {
     return cart;
 })
 
-app.service('checkout', function($http, $localStorage) {
+app.service('checkout', function($http, $localStorage, prices) {
     var checkout = {};
+
+    checkout.complete = function(callback) {
+        var orderDetails = {};
+        orderDetails.accountID = $localStorage.userID;
+        orderDetails.items = $localStorage.cart.items;
+        orderDetails.billing = $localStorage.billingInfo;
+        orderDetails.shipping = $localStorage.shippingInfo;
+        $http.post('/api/complete-checkout', orderDetails).then(function(resp) {
+            callback(resp);
+        });
+
+        // prices.decimalPlace = 2;
+        // prices.currency = '£';
+        // prices.subTotal = 0;
+        // prices.vatPercent = 20;
+        // prices.vat = 0;
+        // prices.grandTotal = 0;
+
+
+    }
 
     return checkout;
 })
@@ -149,13 +176,25 @@ app.service('addresses', function($http, $localStorage) {
         });
     }
 
-    addresses.saveAddress = function(userID, address, callback) {
-        $http.post('/api/add-address', {userID: userID, address: address}).then(function(resp) {
+    addresses.saveAddress = function(userID, billingAddress, shippingAddress, callback) {
+        $http.post('/api/add-address', {userID: userID, billingAddress: billingAddress, shippingAddress: shippingAddress}).then(function(resp) {
             callback(resp);
         });
     }
 
     return addresses;
+})
+
+app.service('orders', function($localStorage, $http) {
+    var orders = {};
+
+    orders.getOrders = function(callback) {
+        $http.post('/api/get-orders', {userID: $localStorage.userID}).then(function(response) {
+            callback(response);
+        })
+    }
+
+    return orders;
 })
 
 app.service('member', function($localStorage, $location, $http, auth, details, alerts) {
@@ -168,29 +207,35 @@ app.service('member', function($localStorage, $location, $http, auth, details, a
     }
 
     member.signup = function(signupData, callback) {
-        $http.post('/api/member/signup', signupData).then(function(response) {
-            console.log(response);
+        $http.post('/api/member/signup', {signupData: signupData, cartID: $localStorage.cart.id}).then(function(response) {
             if(response.data.success == false) {
-                $('#signup-alert').show();
+                toastr.warning(response.data.message);
             } else {
-                auth.saveStorageField('token', response.data.data.token, function(resp) {
-                    $localStorage.userID = response.data.data.id;
-                    $location.path('/account-dashboard');
-                    details.loggedIn = true;
-                })
+                var dat = $.parseJSON(response.data.data);
+                $localStorage.token = response.data.token;
+                $localStorage.userID = dat.id;
+                $localStorage.user = dat;
+                $location.path('/account-dashboard');
+                details.loggedIn = true;
             }
         })
     }
 
     member.login = function(loginData) {
-        $http.post('/api/member/login', loginData).then(function(response) {
-            if(response.data.success == false) {
-                auth.saveStorageField('token', response.data.data, function(resp) {
+        $http.post('/api/member/login',
+        {loginData: loginData, cartID: $localStorage.cart.id}).then(function(response) {
+            if(response.data.status == true) {
+                auth.saveStorageField('token', response.data.token, function(resp) {
+                    var dat = $.parseJSON(response.data.data);
+                    $localStorage.userID = dat.id;
+                    $localStorage.user = dat;
+                    $localStorage.cart = $.parseJSON(response.data.cart);
                     $location.path('/account-dashboard');
                     details.loggedIn = true;
                 })
             } else {
                 // no login do some error
+                toastr.warning(response.data.message);
             }
         })
     }
@@ -225,6 +270,8 @@ app.service('auth', function($window, $location, $http, $localStorage) {
     }
 
     auth.saveStorageField = function(field, value, callback) {
+        console.log(field);
+        console.log(value);
         if(field) {
             $localStorage[field] = value;
             if($localStorage[field]) {
@@ -264,6 +311,10 @@ app.service('func', function() {
 
     func.htmlToPlaintext = function(text) {
         return text ? String(text).replace(/<[^>]+>/gm, '') : '';
+    }
+
+    func.createID = function(callback) {
+        callback((Math.random().toString(16)+"000000000").substr(2,8));
     }
 
     return func;

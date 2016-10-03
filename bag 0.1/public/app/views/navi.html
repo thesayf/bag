@@ -75,8 +75,8 @@
                   <li class="col-sm-3 col-xs-12">
                     <ul class="list-unstyled">
                       <li>Products Grid View</li>
-                      <li ng-repeat="cat in categoryList">
-                          <a href="/{{cat.name}}">{{cat.name}}</a>
+                      <li ng-repeat="cat in localStorage.categoryList">
+                          <a href="/{{cat.slug}}">{{cat.name}}</a>
                       </li>
                     </ul>
                   </li>

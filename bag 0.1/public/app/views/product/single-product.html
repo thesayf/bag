@@ -29,7 +29,7 @@
                   <div id="carousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
                       <div class="item active" data-thumb="0" ng-repeat="img in single.images">
-                        <img src="{{img}}">
+                        <img src="{{img.file.url}}">
                       </div>
                     </div>
                   </div>
@@ -37,7 +37,7 @@
                     <div id="thumbcarousel" class="carousel slide" data-interval="false">
                       <div class="carousel-inner">
                           <div data-target="#carousel" data-slide-to="0" class="thumb" ng-repeat="img in single.images">
-                              <img src="{{img}}">
+                              <img src="{{img.file.url}}">
                           </div>
                       </div>
                     </div>
@@ -182,3 +182,25 @@
           </div>
         </div>
       </section>
+
+
+
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Cart Update</h4>
+       </div>
+       <div class="modal-body">
+           <img width="70" class="media-left media-object" src="{{single.images[0].file.url}}" alt="cart-Image">
+         <h4>{{qty}} x {{single.name}} Added To Cart <span class="float-right">&pound;{{single.price * qty}}</span></h4>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default pad-mid" data-dismiss="modal">Continue Shopping</button>
+         <button type="button" data-dismiss="modal" ng-click="toCart()" class="btn btn-primary pad-mid">Go To Cart</button>
+       </div>
+     </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+ </div><!-- /.modal -->

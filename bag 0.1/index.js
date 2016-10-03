@@ -6,11 +6,10 @@ var bodyParser      = require('body-parser');
 var jwt = require('jsonwebtoken');
 var jwtSecret 	= 'jwtSecretKey';
 
-var Marketcloud = require('marketcloud-node');
-var marketcloud = new Marketcloud.Client({
-    public_key : '4eb1bcc1-677c-40ec-bda0-aa784219c0cc',
-    secret_key : '058G6A9xGv4VAj+GRlybSwOKnwW0IT4SpndC4HzFeF0='
-})
+var Schema = require('schema-client')
+var schemaCli = new Schema.Client('roristore', 'N3WPInduDyru4kkQWdFX23RZStSSNiog');
+
+
 
 // DB
 var mongoose        = require('mongoose');
@@ -30,7 +29,7 @@ cont.func = require('./server/controllers/func.js');
 var libs = {};
 libs.jwt = jwt;
 libs.jwtSecret = jwtSecret;
-libs.marketcloud = marketcloud;
+libs.schemaCli = schemaCli;
 
 // Set Port
 app.set('port', (process.env.PORT || 5002));

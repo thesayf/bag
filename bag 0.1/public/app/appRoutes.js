@@ -32,7 +32,7 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 
     .when('/checkout-step-4', {
         templateUrl : viewDir+'checkout/checkout-step-4.html',
-        controller  : 'MemberCtrl'
+        controller  : 'CheckoutCtrl'
     })
 
     .when('/checkout-complete', {
@@ -68,7 +68,7 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 
     .when('/account-all-orders', {
         templateUrl : viewDir+'member/account-all-orders.html',
-        controller  : 'MemberCtrl'
+        controller  : 'OrdersCtrl'
     })
 
     .when('/account-wishlist', {

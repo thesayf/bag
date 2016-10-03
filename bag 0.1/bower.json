@@ -19,6 +19,6 @@
     "angular-route": "~1.5.6",
     "jquery": "~2.2.4",
     "ngstorage": "^0.3.10",
-    "angular-modal-service": "^0.10.1"
+    "toastr": "^2.1.3"
   }
 }

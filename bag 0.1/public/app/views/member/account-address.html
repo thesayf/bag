@@ -38,12 +38,13 @@
           <div class="row">
             <div class="col-xs-12">
               <div class="innerWrapper">
-                <div ng-if="addresses.hasAddress == true" class="orderBox myAddress">
+                <div class="orderBox myAddress" ng-if="addresses.hasAddress == true || addresses.hasAddressShipping == true">
                   <h4>My Address</h4>
                   <div class="table-responsive">
                     <table class="table">
                       <thead>
-                        <tr>
+                        <tr >
+                          <th>Type</th>
                           <th>Name</th>
                           <th>Address</th>
                           <th>Country</th>
@@ -52,14 +53,27 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr ng-repeat="add in addressList">
-                          <td>{{add.fullName}}</td>
-                          <td>{{add.address1}} {{add.city}} {{add.postalCode}}</td>
-                          <td>{{add.country}}</td>
-                          <td>{{add.phoneNumber}}</td>
+                        <tr ng-if="addresses.hasAddress == true" >
+                          <td>Billing</td>
+                          <td>{{localStorage.user.billing.name}}</td>
+                          <td>{{localStorage.user.billing.address1}} {{localStorage.user.billing.zip}}</td>
+                          <td>UK</td>
+                          <td>{{localStorage.user.billing.phone}}</td>
                           <td>
                             <div class="btn-group" role="group">
-                              <button ng-click="deleteAddress($index)" type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
+                              <button ng-click="deleteAddress('billing')" type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr ng-if="addresses.hasAddressShipping == true">
+                          <td>Shipping</td>
+                          <td>{{localStorage.user.shipping.name}}</td>
+                          <td>{{localStorage.user.shipping.address1}} {{localStorage.user.shipping.zip}}</td>
+                          <td>UK</td>
+                          <td>{{localStorage.user.shipping.phone}}</td>
+                          <td>
+                            <div class="btn-group" role="group">
+                              <button ng-click="deleteAddress('shipping')" type="button" class="btn btn-default"><i class="fa fa-times" aria-hidden="true"></i></button>
                             </div>
                           </td>
                         </tr>
@@ -68,7 +82,7 @@
                   </div>
                 </div>
 
-                <div ng-if="addresses.hasAddress == false" class="orderBox myAddress">
+                <div ng-if="addresses.hasAddress == false && addresses.hasAddressShipping == false" class="orderBox myAddress">
                     <h4>No Addresses</h4>
                 </div>
 

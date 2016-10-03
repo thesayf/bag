@@ -2,9 +2,8 @@ app.controller('HomeCtrl', function($scope, $window, $location, category, catego
     $("#main-css").load(function(){
       $('body').show();
     })
-    category.getCategories(function(resp) {
-        $scope.categoryList = resp;
-    });
+
+
 })
 
 app.controller('CategoryCtrl', function($scope, $window, $location, $http, product, categoryList, product, category, $routeParams) {
@@ -17,28 +16,49 @@ app.controller('CategoryCtrl', function($scope, $window, $location, $http, produ
     category.getCategories(function(resp) {
         $scope.categoryList = resp;
         for(cat in $scope.categoryList) {
-            if($scope.categoryList[cat].name == $scope.categoryName) {
+            if($scope.categoryList[cat].slug == $scope.categoryName) {
                 $scope.categoryID = $scope.categoryList[cat].id;
                 $scope.category = $scope.categoryList[cat];
+                product.getCategoryProduct($scope.categoryID, function(resp) {
+                    $scope.productList = resp.results;
+                })
             }
         }
-        product.getCategoryProduct($scope.categoryID, function(resp) {
-            $scope.productList = resp.data.data;
-            console.log($scope.productList);
-        })
     });
 
 })
 
-app.controller('SingleProductCtrl', function($scope, $window, $location, $http, product, $routeParams, func, category, cart, $localStorage, ModalService) {
+app.controller('SingleProductCtrl', function($scope, $window, $location, $http, product, $routeParams, func, category, cart, $localStorage, ModalService, prices) {
     $scope.qty = '0';
     $scope.stockLevel = '0';
+    $scope.localStorage = $localStorage;
+
+    $scope.updatePrices = function(items) {
+        prices.subTotal = 0;
+        prices.vat = 0;
+        prices.grandTotal = 0;
+        if(items.length > 0) {
+            for(key in items) {
+                prices.subTotal += (items[key].price * items[key].quantity);
+            }
+            prices.vat = prices.subTotal * (prices.vatPercent / 100);
+            prices.vat = Math.ceil(prices.vat * 10) / 10;
+            prices.grandTotal = prices.vat + prices.subTotal;
+        }
+    }
+
 
     $scope.addToCart = function(productID, qty) {
-        cart.addToCart(productID, qty, function(resp) {
-            $localStorage.cart = resp.data.data;
-            ModalService.showModal({
-                templateUrl: "app/views/modals/add-to-cart.html",
+        cart.addToCart(productID, qty, $localStorage.cart.id, function(resp) {
+            console.log(resp);
+            var newCart = $.parseJSON(resp.data.data);
+            console.log(newCart);
+            $scope.localStorage.cart = newCart;
+            $('#myModal').modal();
+            $scope.updatePrices($localStorage.cart.items);
+            /*ModalService.showModal({
+                template: "<div>Fry lives in </div>",
+                ///templateUrl: "app/views/modals/add-to-cart.html",
                 controller: "ModalController"
             }).then(function(modal) {
                 //it's a bootstrap element, use 'modal' to show it
@@ -46,8 +66,15 @@ app.controller('SingleProductCtrl', function($scope, $window, $location, $http, 
                 modal.close.then(function(result) {
                     console.log(result);
                 });
-            });
+            });*/
         })
+    }
+
+    $scope.toCart = function() {
+        $('.modal-backdrop').hide();
+        $('body').css('padding-right', '0');
+        $('body').removeClass('modal-open');
+        $location.path('/cart');
     }
 
     $scope.productName = $routeParams.productName;
@@ -58,8 +85,8 @@ app.controller('SingleProductCtrl', function($scope, $window, $location, $http, 
     });
 
     product.getProductFromUrl($scope.productName, function(resp) {
-        console.log(resp);
-        $scope.single = resp.data.data;
+        console.log(resp.results[0]);
+        $scope.single = resp.results[0];
         $scope.single.description = func.htmlToPlaintext($scope.single.description);
         $scope.stockLevel = $scope.single.stock_level;
         $scope.numberToArray($scope.stockLevel);
@@ -79,20 +106,6 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
     $scope.cart = $localStorage.cart;
     $scope.categoryList = categoryList;
 
-    cart.loadRemoteCart($localStorage.cart.id, function(resp) {
-        $localStorage.cart = resp.data.data;
-        $scope.cart = resp.data.data;
-        $scope.updatePrices($localStorage.cart.items);
-    });
-
-    $scope.removeItem = function(productID) {
-        cart.removeItem($localStorage.cart.id, productID, function(resp) {
-            $localStorage.cart.items = resp.data.data.items;
-            $scope.cart.items = $localStorage.cart.items;
-            $scope.updatePrices($localStorage.cart.items);
-        });
-    }
-
     $scope.updatePrices = function(items) {
         prices.subTotal = 0;
         prices.vat = 0;
@@ -105,6 +118,24 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
             prices.vat = Math.ceil(prices.vat * 10) / 10;
             prices.grandTotal = prices.vat + prices.subTotal;
         }
+    }
+
+    if($localStorage.cart) {
+        console.log($localStorage);
+        //$scope.updatePrices($localStorage.cart.items);
+        /*cart.loadRemoteCart($localStorage.cart.id, function(resp) {
+            $localStorage.cart = resp.data.data;
+            $scope.cart = resp.data.data;
+            $scope.updatePrices($localStorage.cart.items);
+        });*/
+    }
+
+    $scope.removeItem = function(productID) {
+        cart.removeItem($localStorage.cart.id, productID, function(resp) {
+            $localStorage.cart = $.parseJSON(resp.data.data);
+            $scope.cart.items = $localStorage.cart.items;
+            $scope.updatePrices($localStorage.cart.items);
+        });
     }
 
     $scope.goToProductPage = function(catID, productURL) {
@@ -122,12 +153,13 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
         var updateArr = [];
         $.each(cartItemArr, function(k,v) {
             if($(v).val() !== '') {
-                updateArr.push({product_id: $(v).attr('data-product-id'), quantity: $(v).val()});
+                updateArr.push({id: $(v).attr('data-id'), product_id: $(v).attr('data-product-id'), quantity: $(v).val()});
             }
         })
         if(updateArr.length > 0) {
             cart.updateItems($localStorage.cart.id, updateArr, function(resp) {
-                $localStorage.cart.items = resp.data.data.items;
+                console.log(resp.data.data);
+                $localStorage.cart = $.parseJSON(resp.data.data);
                 $scope.cart.items = $localStorage.cart.items;
                 $scope.updatePrices($localStorage.cart.items);
             })
@@ -136,8 +168,30 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
 
 })
 
-app.controller('CheckoutCtrl', function($scope) {
-    //
+app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices) {
+    $scope.localStorage = $localStorage;
+
+    $scope.updatePrices = function(items) {
+        prices.subTotal = 0;
+        prices.vat = 0;
+        prices.grandTotal = 0;
+        if(items.length > 0) {
+            for(key in items) {
+                prices.subTotal += (items[key].price * items[key].quantity);
+            }
+            prices.vat = prices.subTotal * (prices.vatPercent / 100);
+            prices.vat = Math.ceil(prices.vat * 10) / 10;
+            prices.grandTotal = prices.vat + prices.subTotal;
+        }
+    }
+
+    $scope.updatePrices($localStorage.cart.items);
+
+    $scope.completeCheckout = function() {
+        checkout.complete(function(resp) {
+            console.log(resp);
+        })
+    }
 })
 
 app.controller('AddressCtrl', function($scope, $location, addresses, addressList, $localStorage, billingInfo, shippingInfo) {
@@ -148,6 +202,11 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
     $scope.sameShippingAddress = true;
     $scope.billingMatches = false;
     $scope.shippingMatches = false;
+    $scope.billingInfo.country = '';
+    $scope.shippingInfo.country = '';
+    $scope.localStorage = $localStorage;
+    addresses.hasAddress = false;
+    addresses.hasAddressShipping = false;
 
     if($localStorage.billingInfo) {
         $scope.billingInfo = $localStorage.billingInfo;
@@ -159,45 +218,70 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
         $scope.sameShippingAddress = $localStorage.sameShippingAddress;
     }
 
+    if($scope.localStorage.user.billing) {
+        addresses.hasAddress = true;
+    }
+    if($scope.localStorage.user.shipping) {
+        addresses.hasAddressShipping = true;
+    }
+
     $scope.saveAddress = function() {
+
         $localStorage.sameShippingAddress = $scope.sameShippingAddress;
         $localStorage.billingInfo = $scope.billingInfo;
-        for(key in $scope.addressList) {
-            if(angular.toJson($scope.billingInfo) === angular.toJson($scope.addressList[key])) {
-                $scope.billingMatches = true;
-            }
-        }
-
         if($scope.sameShippingAddress == false) {
             $localStorage.shippingInfo = $scope.shippingInfo;
-            for(key in $scope.addressList) {
-                if(angular.toJson($scope.shippingInfo) === angular.toJson($scope.addressList[key])) {
-                    $scope.shippingMatches = true;
-                }
-            }
-            if($scope.billingMatches == true && $scope.shippingMatches == true ) {
-                $location.path('/checkout-step-2');
-            } else {
-                if($scope.billingMatches == true) {
-                    var newAdd = $scope.shippingInfo;
-                } else {
-                    var newAdd = $scope.billingInfo;
-                }
-                addresses.saveAddress($localStorage.userID, newAdd, function(resp) {
-                    $location.path('/checkout-step-2');
-                })
-            }
         } else {
-            if($scope.billingMatches == true) {
-                $location.path('/checkout-step-2');
-            }
+            $scope.shippingInfo = $scope.billingInfo;
+            $localStorage.shippingInfo = $scope.shippingInfo;
         }
+
+        addresses.saveAddress($localStorage.userID, $scope.billingInfo, $scope.shippingInfo, function(resp) {
+            $localStorage.user = $.parseJSON(resp.data.data);
+            $location.path('/checkout-step-2');
+        })
+
+        // /*for(key in $scope.addressList) {
+        //     if(angular.toJson($scope.billingInfo) === angular.toJson($scope.addressList[key])) {
+        //         $scope.billingMatches = true;
+        //     }
+        // }*/
+        //
+        // if($scope.sameShippingAddress == false) {
+        //     $localStorage.shippingInfo = $scope.shippingInfo;
+        //     /*for(key in $scope.addressList) {
+        //         if(angular.toJson($scope.shippingInfo) === angular.toJson($scope.addressList[key])) {
+        //             $scope.shippingMatches = true;
+        //         }
+        //     }*/
+        //     if($scope.billingMatches == true && $scope.shippingMatches == true ) {
+        //         $location.path('/checkout-step-2');
+        //     } else {
+        //         if($scope.billingMatches == true) {
+        //             var newAdd = $scope.shippingInfo;
+        //         } else {
+        //             var newAdd = $scope.billingInfo;
+        //         }
+        //         addresses.saveAddress($localStorage.userID, newAdd, function(resp) {
+        //             $location.path('/checkout-step-2');
+        //         })
+        //     }
+        // } else {
+        //     if($scope.billingMatches == true) {
+        //         $location.path('/checkout-step-2');
+        //     }
+        // }*/
     }
 
     $scope.deleteAddress = function(key) {
         addresses.deleteAddress(key, function(resp) {
             if(resp.data.success == true) {
-                $scope.addressList = resp.data.data.addresses;
+                $localStorage.user = $.parseJSON(resp.data.data);
+                $scope.localStorage.user = $.parseJSON(resp.data.data);
+                if(key == 'billing') {addresses.hasAddress = false;}
+                if(key == 'shipping') {addresses.hasAddressShipping = false;}
+
+                //$scope.addressList = resp.data.data.addresses;
             }
         })
     }
@@ -213,24 +297,79 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
 
     if($location.path() == '/account-address' || $location.path() == '/checkout-step-1') {
         addresses.getAddresses(function(resp) {
-            console.log(resp.data.data[0].addresses);
+
+            /*console.log(resp.data.data[0].addresses);
             if(resp.data.data[0].addresses.length < 1) {
                 // no addresses
                 addresses.hasAddress = false;
             } else {
                 addresses.hasAddress = true;
                 $scope.addressList = resp.data.data[0].addresses;
-            }
+            }*/
         })
     }
 
 })
 
-app.controller('NaviCtrl', function($scope, details, member, customjs, $http, product, category, categoryList) {
+app.controller('OrdersCtrl', function($scope, orders, $localStorage) {
+
+
+    orders.getOrders(function(resp) {
+        $localStorage.orders = $.parseJSON(resp.data.data);
+        $scope.orders = $localStorage.orders;
+    })
+})
+
+app.controller('NaviCtrl', function($scope, details, member, customjs, $http, product, category, categoryList, $localStorage, func, cart, prices) {
     $scope.details = details;
     $scope.customjs = customjs;
     $scope.customjs.go();
     $scope.product = product;
+    $scope.localStorage = $localStorage;
+
+    $scope.updatePrices = function(items) {
+        prices.subTotal = 0;
+        prices.vat = 0;
+        prices.grandTotal = 0;
+        if(items.length > 0) {
+            for(key in items) {
+                prices.subTotal += (items[key].price * items[key].quantity);
+            }
+            prices.vat = prices.subTotal * (prices.vatPercent / 100);
+            prices.vat = Math.ceil(prices.vat * 10) / 10;
+            prices.grandTotal = prices.vat + prices.subTotal;
+        }
+    }
+
+    $scope.updatePrices($localStorage.cart.items);
+
+    if($localStorage.categoryList) {
+        $scope.categoryList = $localStorage.categoryList;
+    } else {
+        category.getCategories(function(resp) {
+            $scope.categoryList = resp;
+            $localStorage.categoryList = $scope.categoryList;
+        });
+    }
+
+
+    // If we have a cart with ID
+    if($localStorage.cart !== undefined) {
+        /*cart.loadRemoteCart($localStorage.cart.id, function(resp) {
+            $localStorage.cart = resp.data.data;
+            $scope.cart = resp.data.data;
+            $scope.updatePrices($localStorage.cart.items);
+        });*/
+    } else {
+        cart.createCart(function(cart) {
+            if(cart.success == true) {
+                $localStorage.cart = $.parseJSON(cart.data);
+            } else {
+                console.log(resp.errMessage);
+            }
+        })
+    }
+
 
     $scope.logout = function() {
         member.logout();

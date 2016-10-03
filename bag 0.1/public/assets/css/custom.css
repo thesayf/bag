@@ -26,3 +26,14 @@
 #footer {
 
 }
+
+.productImage.clearfix.ng-scope > img {
+    height: 250px;
+}
+
+.pointer {cursor: pointer;}
+.float-right {float: right;}
+.pad-mid {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}

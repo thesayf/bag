@@ -1,4 +1,4 @@
-<div navi></div> 
+<div navi></div>
 
 <!-- LIGHT SECTION -->
       <section class="lightSection clearfix pageHeader">
@@ -20,7 +20,7 @@
           </div>
         </div>
       </section>
-      
+
       <!-- MAIN CONTENT SECTION -->
       <section class="mainContent clearfix userProfile">
         <div class="container">
@@ -53,44 +53,12 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>#451231</td>
-                          <td>Mar 25, 2016</td>
-                          <td>2</td>
-                          <td>$99.00</td>
-                          <td><span class="label label-primary">Processing</span></td>
-                          <td><a href="/account-single-order" class="btn btn-default">View</a></td>
-                        </tr>
-                        <tr>
-                          <td>#451231</td>
-                          <td>Mar 25, 2016</td>
-                          <td>3</td>
-                          <td>$150.00</td>
-                          <td><span class="label label-success">Completed</span></td>
-                          <td><a href="/account-single-order" class="btn btn-default">View</a></td>
-                        </tr>
-                        <tr>
-                          <td>#451231</td>
-                          <td>Mar 25, 2016</td>
-                          <td>3</td>
-                          <td>$150.00</td>
-                          <td><span class="label label-danger">Canceled</span></td>
-                          <td><a href="/account-single-order" class="btn btn-default">View</a></td>
-                        </tr>
-                        <tr>
-                          <td>#451231</td>
-                          <td>Mar 25, 2016</td>
-                          <td>2</td>
-                          <td>$99.00</td>
-                          <td><span class="label label-info">On Hold</span></td>
-                          <td><a href="/account-single-order" class="btn btn-default">View</a></td>
-                        </tr>
-                        <tr>
-                          <td>#451231</td>
-                          <td>Mar 25, 2016</td>
-                          <td>3</td>
-                          <td>$150.00</td>
-                          <td><span class="label label-warning">Pending</span></td>
+                        <tr ng-repeat="ord in orders.results">
+                          <td>{{ord.number}}</td>
+                          <td>{{ord.date_created}}</td>
+                          <td>{{ord.item_quantity}}</td>
+                          <td>&pound;{{ord.grand_total}}</td>
+                          <td><span class="label label-primary">{{ord.status}}</span></td>
                           <td><a href="/account-single-order" class="btn btn-default">View</a></td>
                         </tr>
                       </tbody>

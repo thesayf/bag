@@ -43,11 +43,11 @@
                         <tr ng-repeat="item in cart.items">
                           <td class="col-xs-2">
                             <button ng-click="removeItem(item.id)" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <span class="cartImage"><img width="70px" src="{{item.images[0]}}" alt="image"></span>
+                            <span class="cartImage"><img width="70px" src="{{item.product.images[0].file.url}}" alt="image"></span>
                           </td>
-                          <td class="col-xs-4">{{item.name}}</td>
+                          <td class="col-xs-4">{{item.product.name}}</td>
                           <td class="col-xs-2">{{item.price}}</td>
-                          <td class="col-xs-2"><input class="update-qty-input" data-product-id="{{item.id}}" type="text" placeholder="{{item.quantity}}"></td>
+                          <td class="col-xs-2"><input class="update-qty-input" data-product-id="{{item.product_id}}" data-id="{{item.id}}" type="text" placeholder="{{item.quantity}}"></td>
                           <td class="col-xs-2">{{item.price * item.quantity}}</td>
                         </tr>
                       </tbody>
