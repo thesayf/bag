@@ -32,7 +32,7 @@ libs.jwtSecret = jwtSecret;
 libs.schemaCli = schemaCli;
 
 // Set Port
-app.set('port', (process.env.PORT || 5002));
+app.set('port', (process.env.PORT || 5003));
 
 // Set Web Visible Path
 app.use(express.static(__dirname + '/public'));

@@ -139,6 +139,7 @@ app.service('checkout', function($http, $localStorage, prices) {
     checkout.complete = function(callback) {
         var orderDetails = {};
         orderDetails.accountID = $localStorage.userID;
+        orderDetails.cartID = $localStorage.cart.id;
         orderDetails.items = $localStorage.cart.items;
         orderDetails.billing = $localStorage.billingInfo;
         orderDetails.shipping = $localStorage.shippingInfo;

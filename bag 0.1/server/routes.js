@@ -266,6 +266,7 @@ module.exports = function(app, models, cont, libs) {
 
     app.post('/api/complete-checkout', function(req, res) {
         libs.schemaCli.post('/orders', {
+            cart_id: req.body.cartID,
             account_id: req.body.accountID,
             items: req.body.items,
             billing: req.body.billing,
