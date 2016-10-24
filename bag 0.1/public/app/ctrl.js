@@ -168,7 +168,7 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
 
 })
 
-app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices) {
+app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices, $http, $location) {
     $scope.localStorage = $localStorage;
 
     $scope.updatePrices = function(items) {
@@ -188,9 +188,44 @@ app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices)
     $scope.updatePrices($localStorage.cart.items);
 
     $scope.completeCheckout = function() {
-        checkout.complete(function(resp) {
-            console.log(resp);
-        })
+                
+        var total = $localStorage.cart.grand_total;
+        var userID = $localStorage.userID
+                        
+        $(function() {
+          var $form = $('#payment-form');
+          $form.submit(function(event) {
+            // Disable the submit button to prevent repeated clicks:
+            $form.find('.submit').prop('disabled', true);
+              
+            Stripe.setPublishableKey('pk_test_GrFP5ytVZ9Df9ZKztAJbiOmc');
+
+            // Request a token from Stripe:
+            Stripe.card.createToken($form, function(status, res) {
+                console.log(res);
+                
+                res.total = total;
+                res.userID = userID; 
+                $http.post("/api/charge-card", res, {total: total, userID: userID}).success(function(response){
+                            
+                    var paymentID = response.data.id;
+                    checkout.complete(paymentID, function(resp) {
+                    console.log(resp);
+                    delete $localStorage.cart;
+                    $location.url("/checkout-complete");
+                       
+                    })
+                    
+                });
+                
+            });
+
+            // Prevent the form from being submitted:
+            return false;
+          });
+        });
+        
+ 
     }
 })
 

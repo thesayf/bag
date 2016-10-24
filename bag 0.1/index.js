@@ -9,7 +9,7 @@ var jwtSecret 	= 'jwtSecretKey';
 var Schema = require('schema-client')
 var schemaCli = new Schema.Client('roristore', 'N3WPInduDyru4kkQWdFX23RZStSSNiog');
 
-
+var stripe = require("stripe")("sk_test_L7l15Y9Hf3elbyUbjdcxlGiC");
 
 // DB
 var mongoose        = require('mongoose');
@@ -47,7 +47,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 // routes
-require(__dirname + '/server/routes')(app, models, cont, libs);
+require(__dirname + '/server/routes')(app, models, cont, libs, stripe);
 
 app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));

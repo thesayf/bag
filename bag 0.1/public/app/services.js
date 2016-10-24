@@ -136,13 +136,18 @@ app.service('cart', function($http, $localStorage) {
 app.service('checkout', function($http, $localStorage, prices) {
     var checkout = {};
 
-    checkout.complete = function(callback) {
+    checkout.complete = function(paymentID, callback) {
+        
+        console.log(paymentID);
+        
         var orderDetails = {};
         orderDetails.accountID = $localStorage.userID;
         orderDetails.cartID = $localStorage.cart.id;
         orderDetails.items = $localStorage.cart.items;
         orderDetails.billing = $localStorage.billingInfo;
         orderDetails.shipping = $localStorage.shippingInfo;
+        orderDetails.PaymentID = paymentID;
+
         $http.post('/api/complete-checkout', orderDetails).then(function(resp) {
             callback(resp);
         });

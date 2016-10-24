@@ -35,3 +35,17 @@ Page entry
 - put an ng-repeat on the products to show so that it loads all of the products up
 
 add links (completed)
+
+
+
+so if the payment is succesful it;
+    - sends the response back
+    - then sends the job through as completed
+    - if that is successful it deletes the cart
+    - and then goes to the booking is successful page
+    
+    Boogs
+    - the when the cat is deleted it messed up the quantities and prices going forward
+    - i need to make it so that when the payments go through they go through as paid
+    - When you log out it is not deleting cart from local storage its not deleting anything from local storage 
+    - quantities are not working on shoes for some reson now

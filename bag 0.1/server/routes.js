@@ -1,4 +1,4 @@
-module.exports = function(app, models, cont, libs) {
+module.exports = function(app, models, cont, libs, stripe) {
 
     app.post("/api/get-product-from-url", function (req, res){
         libs.schemaCli.get('/products', {
@@ -265,16 +265,47 @@ module.exports = function(app, models, cont, libs) {
     })
 
     app.post('/api/complete-checkout', function(req, res) {
+        
+        // Processing the order
+        
         libs.schemaCli.post('/orders', {
             cart_id: req.body.cartID,
             account_id: req.body.accountID,
             items: req.body.items,
             billing: req.body.billing,
             shipping: req.body.shipping,
+            authorized_payment_id: req.body.PaymentID,
             'items.taxes.amount' : req.body.itemsTaxesAmount
         }, function(err, result) {
-            console.log(err);
-            console.log(result);
+
+            //If theres and error proccessing the order
+            if(err) {
+                res.json({
+                            data: err,
+                            message: 'Couldnt Complete Order!'
+                        });
+            //If there is no error processing then Delete the active cart 
+            } else {
+              libs.schemaCli.delete('/carts/{id}', { id: req.body.cartID }, function(err, result) {
+                  
+            // If there is an error deleting the cart 
+                  if(err){
+                      res.json({
+                            data: err,
+                            message: 'Couldnt Delete Cart'
+                        });
+            //If the cart has been deleted
+                  }else{
+                     res.json({
+                        success: true,
+                        message: 'The cart has been deleted',
+                        data: result
+                    });
+                      
+                  }
+              });
+            }
+            
         });
     })
 
@@ -373,7 +404,62 @@ module.exports = function(app, models, cont, libs) {
 			res.json({status: false});
 		}
 	});
-
+    
+    
+    app.post('/api/charge-card', function(req, res) {
+        
+        console.log(req.body);
+        
+//        console.log("payment")
+//        console.log(req.body.total)
+//        console.log(req.body.userID)
+        
+        var price = req.body.total;
+        var userID = req.body.total;
+        var token = req.body.id;
+        
+//        console.log(price);
+//        console.log(userID);
+        
+        var charge = stripe.charges.create({        
+          amount: price*100, // Amount in cents
+          currency: "gbp",
+          source: token,
+          description: "Example charge"
+            }, function(err, charge) {
+            if (err && err.type === 'StripeCardError') {
+                console.log(err)
+    // The card has been declined
+            } else{
+                console.log(charge);
+                console.log("it has been charged");
+                res.json({
+                                status: true,
+                                data: charge,
+                                message: 'Successful payment!'
+                            });
+            }
+        });
+        
+//         stripe.charges.create({
+//        amount: price*100, // stripe takes pence
+//        currency: "GBP",
+//        customer: customerID, // obtained with Stripe.js
+//        description: "Charge for "+customerID
+//    }, function(err, charge) {
+//        // asynchronously called
+//        if(err) {
+//            callback(err);
+//        } else {
+//            callback(charge);
+//        }
+//    });
+        
+        
+    })
+    
+    
+    
 	app.get('*', function(req, res) {
         res.render('pages/index');
     });

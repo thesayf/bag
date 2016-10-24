@@ -1,12 +1,13 @@
 <div navi></div>
 
+
 <!-- LIGHT SECTION -->
       <section class="lightSection clearfix pageHeader">
         <div class="container">
           <div class="row">
             <div class="col-xs-6">
               <div class="page-title">
-                <h2>payment method</h2>
+                <h2>review</h2>
               </div>
             </div>
             <div class="col-xs-6">
@@ -14,7 +15,7 @@
                 <li>
                   <a href="index.html">Home</a>
                 </li>
-                <li class="active">payment method</li>
+                <li class="active">review</li>
               </ol>
             </div>
           </div>
@@ -42,13 +43,13 @@
                   </div>
 
                   <div class="col-xs-3 progress-wizard-step active">
-                    <div class="text-center progress-wizard-stepnum">Payment Method</div>
+                    <div class="text-center progress-wizard-stepnum">Review</div>
                     <div class="progress"><div class="progress-bar"></div></div>
                     <a href="checkout-step-3.html" class="progress-wizard-dot"></a>
                   </div>
 
                   <div class="col-xs-3 progress-wizard-step disabled">
-                    <div class="text-center progress-wizard-stepnum">Review</div>
+                    <div class="text-center progress-wizard-stepnum">Payment Method</div>
                     <div class="progress"><div class="progress-bar"></div></div>
                     <a href="checkout-step-4.html" class="progress-wizard-dot"></a>
                   </div>
@@ -57,69 +58,129 @@
                 <form action="" class="row" method="POST" role="form">
                   <div class="col-xs-12">
                     <div class="page-header">
-                      <h4>Payment Information</h4>
+                      <h4>order review</h4>
                     </div>
                   </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">Payment By</label>
-                    <span class="step-drop">
-                      <select name="guiest_id3" id="guiest_id3" class="select-drop">
-                        <option value="0">Credit Card</option>
-                        <option value="1">Credit Card 1</option>
-                        <option value="2">Credit Card 2</option>
-                        <option value="3">Credit Card 3</option>
-                      </select>
-                    </span>
-                  </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">Card type</label>
-                    <span class="step-drop">
-                      <select name="guiest_id3" id="guiest_id3" class="select-drop">
-                        <option value="0">Visa Card</option>
-                        <option value="1">Visa Card 1</option>
-                        <option value="2">Visa Card 2</option>
-                        <option value="3">Visa Card 3</option>
-                      </select>
-                    </span>
-                  </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">Card Number</label>
-                    <input type="password" class="form-control" id="">
-                  </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">Expiration Date</label>
-                    <div class="row">
-                      <div class="col-xs-6">
-                        <span class="step-drop">
-                          <select name="guiest_id3" id="guiest_id3" class="select-drop">
-                            <option value="0">month</option>
-                            <option value="1">month 1</option>
-                            <option value="2">month 2</option>
-                            <option value="3">month 3</option>
-                          </select>
-                        </span>
+                  <div class="col-sm-6 col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Billing Address</h4>
                       </div>
-                      <div class="col-xs-6">
-                        <span class="step-drop">
-                          <select name="guiest_id3" id="guiest_id3" class="select-drop">
-                            <option value="0">2016</option>
-                            <option value="1">2017</option>
-                            <option value="2">2018</option>
-                            <option value="3">2019</option>
-                          </select>
-                        </span>
+                      <div class="panel-body">
+                        <address>
+                          <strong>{{localStorage.billingInfo.fullName}}</strong><br>
+                          {{localStorage.billingInfo.address1}}, <br>
+                          {{localStorage.billingInfo.city}}, {{localStorage.billingInfo.postalCode}} <br>
+                          UK
+                        </address>
                       </div>
                     </div>
                   </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">CV Code</label>
-                    <input type="text" class="form-control" id="">
+                  <div class="col-sm-6 col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Shipping Address</h4>
+                      </div>
+                      <div class="panel-body">
+                        <address>
+                            <strong>{{localStorage.shippingInfo.fullName}}</strong><br>
+                            {{localStorage.shippingInfo.address1}}, <br>
+                            {{localStorage.shippingInfo.city}}, {{localStorage.shippingInfo.postalCode}} <br>
+                            UK
+                        </address>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Payment Method</h4>
+                      </div>
+                      <div class="panel-body">
+                        <address>
+                          <span>Credit Card - VISA</span>
+                        </address>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6 col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Shipping Method</h4>
+                      </div>
+                      <div class="panel-body">
+                        <address>
+                          <span>Post Air Mail</span>
+                        </address>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Order Details</h4>
+                      </div>
+                      <div class="panel-body">
+                        <div class="row">
+                          <div class="col-sm-4 col-xs-12">
+                            <address>
+                              <a href="#">Email: {{localStorage.user.email}}</a> <br>
+                              <span>Phone: {{localStorage.billingInfo.phone}}</span>
+                            </address>
+                          </div>
+                          <div class="col-sm-8 col-xs-12">
+                            <address>
+                              <span>Additional Information: </span><br>
+                              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+                            </address>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xs-12">
+                    <div class="cartListInner">
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th>Product Name</th>
+                              <th>Price</th>
+                              <th>Quantity</th>
+                              <th>Sub Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                              <tr ng-repeat="item in cart.items">
+                                <td class="col-xs-2">
+                                  <button ng-click="removeItem(item.id)" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                  <span class="cartImage"><img width="70px" src="{{item.product.images[0].file.url}}" alt="image"></span>
+                                </td>
+                                <td class="col-xs-4">{{item.product.name}}</td>
+                                <td class="col-xs-2">{{item.price}}</td>
+                                <td class="col-xs-2">{{item.quantity}}</td>
+                                <td class="col-xs-2">{{item.price * item.quantity}}</td>
+                              </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="row totalAmountArea">
+                        <div class="col-sm-4 col-sm-offset-8 col-xs-12">
+                            <ul class="list-unstyled">
+                              <li>Sub Total <span>{{prices.currency}}{{prices.subTotal}}</span></li>
+                              <li>UK Vat <span>{{prices.currency}}{{prices.vat}}</span></li>
+                              <li>Grand Total <span class="grandTotal">{{prices.currency}}{{prices.grandTotal}}</span></li>
+                            </ul>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div class="col-xs-12">
                     <div class="well well-lg clearfix">
                       <ul class="pager">
-                      <li class="previous"><a href="/checkout-step-2">back</a></li>
-                        <li class="next"><a href="/checkout-step-4">Continue</a></li>
+                      <li class="previous"><a href="/checkout-step-2">Back</a></li>
+                        <li class="next "><a class="pointer" href="/checkout-step-4">Confirm</a></li>
                       </ul>
                     </div>
                   </div>
