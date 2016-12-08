@@ -91,6 +91,11 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
         controller  : 'MemberCtrl'
     })
 
+    .when('/reset-password', {
+        templateUrl : viewDir+'pages/reset-password.html',
+        controller  : 'MemberCtrl'
+    })
+
     .when('/terms-and-conditions', {
         templateUrl : viewDir+'pages/terms-and-conditions.html',
         controller  : 'MemberCtrl'

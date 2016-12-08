@@ -137,9 +137,9 @@ app.service('checkout', function($http, $localStorage, prices) {
     var checkout = {};
 
     checkout.complete = function(paymentID, callback) {
-        
+
         console.log(paymentID);
-        
+
         var orderDetails = {};
         orderDetails.accountID = $localStorage.userID;
         orderDetails.cartID = $localStorage.cart.id;
@@ -245,6 +245,22 @@ app.service('member', function($localStorage, $location, $http, auth, details, a
             }
         })
     }
+
+    member.lostPassword = function(email) {
+        $http.post('/api/member/lost-password', {data: email}).then(function(resp) {
+            if(resp.data.status == true) {
+                toastr.success(response.data.message);
+            }
+        })
+    }
+
+    member.resetPassword = function(password, resetCode, cb) {
+        $http.post('/api/member/reset-password', {password: password, resetCode: resetCode}).then(function(resp) {
+            cb(resp);
+        })
+    }
+
+
     return member;
 })
 

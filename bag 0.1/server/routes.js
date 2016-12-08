@@ -265,9 +265,9 @@ module.exports = function(app, models, cont, libs, stripe) {
     })
 
     app.post('/api/complete-checkout', function(req, res) {
-        
+
         // Processing the order
-        
+
         libs.schemaCli.post('/orders', {
             cart_id: req.body.cartID,
             account_id: req.body.accountID,
@@ -284,11 +284,11 @@ module.exports = function(app, models, cont, libs, stripe) {
                             data: err,
                             message: 'Couldnt Complete Order!'
                         });
-            //If there is no error processing then Delete the active cart 
+            //If there is no error processing then Delete the active cart
             } else {
               libs.schemaCli.delete('/carts/{id}', { id: req.body.cartID }, function(err, result) {
-                  
-            // If there is an error deleting the cart 
+
+            // If there is an error deleting the cart
                   if(err){
                       res.json({
                             data: err,
@@ -301,11 +301,11 @@ module.exports = function(app, models, cont, libs, stripe) {
                         message: 'The cart has been deleted',
                         data: result
                     });
-                      
+
                   }
               });
             }
-            
+
         });
     })
 
@@ -404,24 +404,91 @@ module.exports = function(app, models, cont, libs, stripe) {
 			res.json({status: false});
 		}
 	});
-    
-    
-    app.post('/api/charge-card', function(req, res) {
-        
+
+    app.post('/api/member/lost-password', function(req, res) {
+        var email = req.body.data;
+        var date = new Date();
+        date.setDate(date.getDate() + 1);
+        var resetExpired = date.getTime();
+        cont.func.makeId(function(randID) {
+            libs.schemaCli.get('/accounts/{email}', {
+                email: email
+            }, function(err, resp){
+                libs.schemaCli.put('/accounts/{id}', {
+                    id: resp.id,
+                    $notify: 'password-reset',
+                    password_reset_url: 'http://localhost:5003/reset-password?code='+randID+'',
+                    password_reset_key: randID,
+                    password_reset_expired: resetExpired
+                }, function(err, resp) {
+                    if(err) {} else {
+                        cont.func.sendInfo(res, true, {message: 'Check Your Email For The Password Reset Link!'});
+                    }
+                });
+            })
+
+            /*cont.func.updateRecord(models.User, {key: 'email', value: email}, {resetCode: randID}, function(status) {
+                if(status == true) {
+                    var from_email = new libs.sgHelper.Email('yasinadam@outlook.com');
+                    var to_email = new libs.sgHelper.Email('yasinadam@outlook.com');
+                    var subject = 'Big Bag Password Reset Link';
+                    var content = new libs.sgHelper.Content('text/plain', 'http://localhost:5003/reset-password?code='+randID+'');
+                    var mailObj = new libs.sgHelper.Mail(from_email, subject, to_email, content);
+
+                    cont.func.sendEmail(libs.sg, mailObj, function(resp) {
+
+                    })
+                }
+            })*/
+        })
+    });
+
+    app.post('/api/member/reset-password', function(req, res) {
         console.log(req.body);
-        
+        var password = req.body.password;
+        var resetCode = req.body.resetCode;
+        /*cont.func.updateRecord(models.User, {key: 'resetCode', value: resetCode}, {password: password}, function(status) {
+                if(status == true) {
+                    cont.func.sendInfo(res, status, {message: 'Password Reset!'});
+                }
+        })*/
+
+        libs.schemaCli.get('/accounts/:first', {
+            password_reset_key: resetCode
+        }, function(err, result) {
+            libs.schemaCli.put('/accounts/{id}', {
+              id: result.id,
+              password: password,
+              password_reset_url: null,
+              password_reset_key: null,
+              password_reset_expired: null
+          }, function(err, resp) {
+              if(err) {} else {
+                  cont.func.sendInfo(res, true, {message: 'Password Reset!'});
+              }
+          });
+
+        });
+
+    });
+
+
+    app.post('/api/charge-card', function(req, res) {
+
+        console.log(req.body);
+
 //        console.log("payment")
 //        console.log(req.body.total)
 //        console.log(req.body.userID)
-        
+
         var price = req.body.total;
         var userID = req.body.total;
         var token = req.body.id;
-        
+
 //        console.log(price);
 //        console.log(userID);
-        
-        var charge = stripe.charges.create({        
+
+        var charge = stripe.charges.create({
           amount: price*100, // Amount in cents
           currency: "gbp",
           source: token,
@@ -440,7 +507,7 @@ module.exports = function(app, models, cont, libs, stripe) {
                             });
             }
         });
-        
+
 //         stripe.charges.create({
 //        amount: price*100, // stripe takes pence
 //        currency: "GBP",
@@ -454,12 +521,12 @@ module.exports = function(app, models, cont, libs, stripe) {
 //            callback(charge);
 //        }
 //    });
-        
-        
+
+
     })
-    
-    
-    
+
+
+
 	app.get('*', function(req, res) {
         res.render('pages/index');
     });

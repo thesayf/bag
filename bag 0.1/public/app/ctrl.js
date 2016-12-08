@@ -188,44 +188,44 @@ app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices,
     $scope.updatePrices($localStorage.cart.items);
 
     $scope.completeCheckout = function() {
-                
+
         var total = $localStorage.cart.grand_total;
         var userID = $localStorage.userID
-                        
+
         $(function() {
           var $form = $('#payment-form');
           $form.submit(function(event) {
             // Disable the submit button to prevent repeated clicks:
             $form.find('.submit').prop('disabled', true);
-              
+
             Stripe.setPublishableKey('pk_test_GrFP5ytVZ9Df9ZKztAJbiOmc');
 
             // Request a token from Stripe:
             Stripe.card.createToken($form, function(status, res) {
                 console.log(res);
-                
+
                 res.total = total;
-                res.userID = userID; 
+                res.userID = userID;
                 $http.post("/api/charge-card", res, {total: total, userID: userID}).success(function(response){
-                            
+
                     var paymentID = response.data.id;
                     checkout.complete(paymentID, function(resp) {
                     console.log(resp);
                     delete $localStorage.cart;
                     $location.url("/checkout-complete");
-                       
+
                     })
-                    
+
                 });
-                
+
             });
 
             // Prevent the form from being submitted:
             return false;
           });
         });
-        
- 
+
+
     }
 })
 
@@ -421,6 +421,11 @@ app.controller('MemberCtrl', function($scope, $http, $location, auth, member, al
     $scope.confirmPassword = '';
     $scope.loginData = {};
     $scope.alerts = alerts;
+    $scope.lostEmail = '';
+    $scope.newPassword = '';
+    $scope.resetCode = $location.search().code;
+
+
 
     $scope.signupDataSubmit = function() {
         console.log($scope.signupData);
@@ -431,6 +436,28 @@ app.controller('MemberCtrl', function($scope, $http, $location, auth, member, al
         member.login($scope.loginData, function() {
 
         });
+    }
+
+    $scope.forgotPasswordSubmit = function() {
+        if($scope.lostEmail !== '') {
+            member.lostPassword($scope.lostEmail, function() {
+
+            })
+        }
+    }
+
+    $scope.resetPassword = function() {
+        if($scope.resetCode.length > 3) {
+            if($scope.newPassword !== '') {
+                member.resetPassword($scope.newPassword, $scope.resetCode, function(resp) {
+                    if(resp.data.success == true) {
+                          toastr.success(resp.data.message);
+                          $location.path('/login');
+                    }
+                })
+            }
+        }
+
     }
 
     $scope.authenticate = function() {

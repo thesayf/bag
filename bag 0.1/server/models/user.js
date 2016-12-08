@@ -7,7 +7,8 @@ var userSchema = mongoose.Schema({
     email: String,
     password: String,
     userID: Number,
-    addresses: []
+    addresses: [],
+    resetCode: String
 });
 
 // create the model for users and expose it to our app

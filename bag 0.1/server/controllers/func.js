@@ -37,22 +37,26 @@ func.addRecord = function(model, dataObj, callback) {
 func.updateRecord = function(model, selector, dataObj, callback) {
     query = {};
     query[selector.key] = selector.value;
-    console.log(query);
 
     model.findOne(query, function(err, doc) {
-        for (var prop in dataObj) {
-            if(prop !== '_id') {
-                doc[prop] = dataObj[prop];
+        if(err) {
+            callback(err);
+        } else {
+            for (var prop in dataObj) {
+                if(prop !== '_id') {
+                    doc[prop] = dataObj[prop];
+                }
             }
+            doc.save(function(err) {
+                if(err) {
+                    console.log(err);
+                    callback(err);
+                } else {
+                    callback(true);
+                }
+            })
         }
-        doc.save(function(err) {
-            if(err) {
-                console.log(err);
-                callback(err);
-            } else {
-                callback(true);
-            }
-        })
+
     });
 }
 
@@ -114,5 +118,31 @@ func.sendInfo = function(res, status, dataObj) {
         })
     }
 }
+
+func.makeId = function(cb) {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 15; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    cb(text);
+}
+
+func.sendEmail = function(sg, emailObj, cb) {
+    var request = sg.emptyRequest({
+      method: 'POST',
+      path: '/v3/mail/send',
+      body: emailObj.toJSON(),
+    });
+
+    sg.API(request, function(error, response) {
+        console.log(error);
+      console.log(response.statusCode);
+      console.log(response.body);
+      console.log(response.headers);
+    });
+}
+
 
 module.exports = func;

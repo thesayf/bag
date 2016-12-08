@@ -11,6 +11,9 @@ var schemaCli = new Schema.Client('roristore', 'N3WPInduDyru4kkQWdFX23RZStSSNiog
 
 var stripe = require("stripe")("sk_test_L7l15Y9Hf3elbyUbjdcxlGiC");
 
+var sgHelper = require('sendgrid').mail;
+var sg = require('sendgrid')('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');
+
 // DB
 var mongoose        = require('mongoose');
 // DB Collection
@@ -30,6 +33,8 @@ var libs = {};
 libs.jwt = jwt;
 libs.jwtSecret = jwtSecret;
 libs.schemaCli = schemaCli;
+libs.sgHelper = sgHelper;
+libs.sg = sg;
 
 // Set Port
 app.set('port', (process.env.PORT || 5003));
