@@ -22,12 +22,12 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 
     .when('/checkout-step-2', {
         templateUrl : viewDir+'checkout/checkout-step-2.html',
-        controller  : 'MemberCtrl'
+        controller  : 'CheckoutCtrl'
     })
 
     .when('/checkout-step-3', {
         templateUrl : viewDir+'checkout/checkout-step-3.html',
-        controller  : 'MemberCtrl'
+        controller  : 'CheckoutCtrl'
     })
 
     .when('/checkout-step-4', {
@@ -37,7 +37,7 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 
     .when('/checkout-complete', {
         templateUrl : viewDir+'checkout/checkout-complete.html',
-        controller  : 'MemberCtrl'
+        controller  : 'CheckoutCtrl'
     })
 
     .when('/signup', {
@@ -76,10 +76,6 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
         controller  : 'MemberCtrl'
     })
 
-    .when('/account-single-order', {
-        templateUrl : viewDir+'member/account-single-order.html',
-        controller  : 'MemberCtrl'
-    })
 
     .when('/about-us', {
         templateUrl : viewDir+'pages/about-us.html',
@@ -99,6 +95,16 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
     .when('/terms-and-conditions', {
         templateUrl : viewDir+'pages/terms-and-conditions.html',
         controller  : 'MemberCtrl'
+    })
+
+    /*.when('/account-single-order', {
+        templateUrl : viewDir+'member/account-single-order.html',
+        controller  : 'MemberCtrl'
+    })*/
+
+    .when('/account-single-order/:singleOrder', {
+        templateUrl : viewDir+'member/account-single-order.html',
+        controller  : 'OrdersCtrl'
     })
 
     .when('/:categoryName', {

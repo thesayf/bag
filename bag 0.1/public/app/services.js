@@ -89,6 +89,12 @@ app.service('product', function($http) {
         });
     }
 
+    product.getProductFromID = function(productID, callback) {
+        $http.post('/api/get-product-from-id', {productID}).then(function(resp) {
+            callback(resp.data.data);
+        });
+    }
+
     return product;
 })
 
@@ -144,9 +150,23 @@ app.service('checkout', function($http, $localStorage, prices) {
         orderDetails.accountID = $localStorage.userID;
         orderDetails.cartID = $localStorage.cart.id;
         orderDetails.items = $localStorage.cart.items;
+        orderDetails.cart = $localStorage.cart;
         orderDetails.billing = $localStorage.billingInfo;
         orderDetails.shipping = $localStorage.shippingInfo;
         orderDetails.PaymentID = paymentID;
+        orderDetails.shipmentPrice = $localStorage.cart.shipment_price;
+        orderDetails.service_name = 'royal-mail-first-class';
+        orderDetails.shipment = {
+            address1: $localStorage.shippingInfo.address1,
+            city: $localStorage.shippingInfo.city,
+            name: $localStorage.shippingInfo.name,
+            phone: $localStorage.shippingInfo.phone,
+            zip: $localStorage.shippingInfo.zip,
+            items: $localStorage.cart.items,
+            service_name: 'royal-mail-first-class',
+            country: 'GB',
+            price: $localStorage.cart.shipment_price
+        }
 
         $http.post('/api/complete-checkout', orderDetails).then(function(resp) {
             callback(resp);
@@ -158,8 +178,14 @@ app.service('checkout', function($http, $localStorage, prices) {
         // prices.vatPercent = 20;
         // prices.vat = 0;
         // prices.grandTotal = 0;
+    }
 
-
+    checkout.getDelivery = function(cb) {
+        $http.post('/api/checkout/get-delivery').then(function(resp) {
+            if(resp.data.success == true) {
+                cb(resp.data.data);
+            }
+        })
     }
 
     return checkout;
@@ -208,6 +234,11 @@ app.service('member', function($localStorage, $location, $http, auth, details, a
 
     member.logout = function() {
         delete $localStorage.token;
+        delete $localStorage.shippingInfo;
+        delete $localStorage.billingInfo;
+        delete $localStorage.user;
+        delete $localStorage.userID;
+        delete $localStorage.orderNumber;
         details.loggedIn = false;
         $location.path('/login');
     }
@@ -257,6 +288,12 @@ app.service('member', function($localStorage, $location, $http, auth, details, a
     member.resetPassword = function(password, resetCode, cb) {
         $http.post('/api/member/reset-password', {password: password, resetCode: resetCode}).then(function(resp) {
             cb(resp);
+        })
+    }
+
+    member.updateProfile = function(profileData, cb) {
+        $http.post('/api/member/update-profile', {data: profileData}).then(function(resp) {
+            cb(resp.data);
         })
     }
 
@@ -337,6 +374,49 @@ app.service('func', function() {
 
     func.createID = function(callback) {
         callback((Math.random().toString(16)+"000000000").substr(2,8));
+    }
+
+    func.validate = function(val, type, msg) {
+
+        var flag = 0;
+
+        function validateEmail(email) {
+            var re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        }
+
+        if(type == 'text') {
+            if(val == undefined || val == '') {
+                toastr.warning(msg);
+                flag++;
+            }
+        }
+        if(type == 'email') {
+            if(val == undefined || val == '') {
+                toastr.warning(msg);
+                flag++;
+            } else {
+                var emailVali = validateEmail(val);
+                if(emailVali == false) {
+                    toastr.warning(msg);
+                    flag++;
+                }
+            }
+        }
+        if(type == 'password') {
+            if(val == undefined || val == '' || val.length < 5) {
+                toastr.warning(msg);
+                flag++;
+            }
+        }
+
+        if(type == 'number') {
+            if(isNaN(val) || val == 0) {
+                toastr.warning(msg);
+                flag++;
+            }
+        }
+        return flag;
     }
 
     return func;

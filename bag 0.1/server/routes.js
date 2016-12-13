@@ -62,6 +62,33 @@ module.exports = function(app, models, cont, libs, stripe) {
         })
     })
 
+    app.post("/api/get-product-from-id", function (req, res){
+        //console.log(req.body.productID);
+        //console.log('req prodid ^');
+        var prodCol = [];
+
+        // Get a collection of records with field criteria
+        libs.schemaCli.get('/products', {
+            active: true,
+            expand: 'images'
+        }, function(err, records) {
+            var count = 0;
+            records.each(function(record) {
+                console.log(record.id);
+                console.log(req.body.productID[count]);
+                if(req.body.productID.indexOf(record.id) !== -1) {
+                    console.log('in');
+                    prodCol.push(record);
+                }
+                if(count+1 == records.length) {
+                    cont.func.sendInfo(res, true, {data: prodCol, message: 'Product Sent.'});
+                }
+                count = count + 1;
+            })
+        });
+
+    })
+
     app.post('/api/create-cart', function(req, res) {
         libs.schemaCli.post('/carts', {
 
@@ -82,7 +109,7 @@ module.exports = function(app, models, cont, libs, stripe) {
                 cart_id: req.body.cartID,
                 items: {
                     product_id: req.body.product,
-                    qty: req.body.qty
+                    quantity: req.body.qty
                 }
             };
             libs.schemaCli.put('/carts/{cart_id}/items', cartData, function(err, data) {
@@ -201,15 +228,16 @@ module.exports = function(app, models, cont, libs, stripe) {
             id: req.body.userID,
             'billing.address1': req.body.billingAddress.address1,
             'billing.city': req.body.billingAddress.city,
-            'billing.name': req.body.billingAddress.fullName,
+            'billing.name': req.body.billingAddress.name,
             'billing.phone': req.body.billingAddress.phoneNumber,
             'billing.zip': req.body.billingAddress.postalCode,
             'shipping.address1': req.body.shippingAddress.address1,
             'shipping.city': req.body.shippingAddress.city,
-            'shipping.name': req.body.shippingAddress.fullName,
+            'shipping.name': req.body.shippingAddress.name,
             'shipping.phone': req.body.shippingAddress.phoneNumber,
             'shipping.zip': req.body.shippingAddress.postalCode
         }, function(err, resp) {
+            console.log(err);
             console.log(resp);
             if(err) {
                 cont.func.sendInfo(res, false, {data: data, errMessage: 'Billing Address Not Added!'});
@@ -267,46 +295,113 @@ module.exports = function(app, models, cont, libs, stripe) {
     app.post('/api/complete-checkout', function(req, res) {
 
         // Processing the order
-
         libs.schemaCli.post('/orders', {
             cart_id: req.body.cartID,
             account_id: req.body.accountID,
             items: req.body.items,
             billing: req.body.billing,
-            shipping: req.body.shipping,
+            shipping: req.body.shipment,
             authorized_payment_id: req.body.PaymentID,
             'items.taxes.amount' : req.body.itemsTaxesAmount
-        }, function(err, result) {
-
+        }, function(err, orderResult) {
             //If theres and error proccessing the order
             if(err) {
                 res.json({
-                            data: err,
-                            message: 'Couldnt Complete Order!'
-                        });
+                    data: err,
+                    message: 'Couldnt Complete Order!'
+                });
             //If there is no error processing then Delete the active cart
             } else {
-              libs.schemaCli.delete('/carts/{id}', { id: req.body.cartID }, function(err, result) {
+                libs.schemaCli.post('/shipments', {
+                    items: req.body.items,
+                    order_id: orderResult.id,
+                    destination: req.body.shipment,
+                    service: req.body.service_name,
+                    service_name: req.body.service_name
+                }, function(err, shipResult) {
+                    libs.schemaCli.get('/invoices', {
+                        order_id : orderResult.id
+                    },function(err, invoiceResult) {
+                        var invoiceID = invoiceResult.results[0].id;
+                        libs.schemaCli.post('/payments', {
+                            account_id: req.body.accountID,
+                            amount: req.body.cart.grand_total_del,
+                            method: 'cash',
+                            order_id: orderResult.id,
+                            success : true,
+                            captured: true,
+                            invoice_id: invoiceID,
+                            transaction_id: req.body.PaymentID
+                        }, function(err, pay) {
+                            libs.schemaCli.put('/invoices/{id}', {
+                                id: invoiceID,
+                                paid: true
+                            }, function(err, invoicePaidResult) {
+                                libs.schemaCli.delete('/carts/{id}', {
+                                    id: req.body.cartID
+                                }, function(err, result) {
+                                    cont.func.sendInfo(res, true, {data: orderResult.number, message: 'Order Created'});
+                                })
 
-            // If there is an error deleting the cart
-                  if(err){
-                      res.json({
-                            data: err,
-                            message: 'Couldnt Delete Cart'
+                            })
+                        })
+
+                    })
+                })
+
+
+                /*libs.schemaCli.post('/payments', {
+                    account_id: req.body.accountID,
+                    amount: req.body.cart.grand_total_del,
+                    method: 'cash',
+                    order_id: result.id,
+                    success : true
+                }, function(err, pay) {
+                    console.log('order pay');
+                    console.log(pay);
+                    libs.schemaCli.post('/shipments', {
+                        items: req.body.items,
+                        order_id: pay.id,
+                        destination: req.body.shipment,
+                        service: req.body.service_name,
+                        service_name: req.body.service_name
+                    }, function(err, result) {
+                        console.log(err);
+                        console.log(result);
+                        libs.schemaCli.delete('/carts/{id}', { id: req.body.cartID }, function(err, result) {
+                            // If there is an error deleting the cart
+                            if(err){
+                                res.json({
+                                      data: err,
+                                      message: 'Couldnt Delete Cart'
+                                  });
+                              //If the cart has been deleted
+                            }else{
+                               res.json({
+                                  success: true,
+                                  message: 'The cart has been deleted',
+                                  data: result
+                              });
+
+                            }
                         });
-            //If the cart has been deleted
-                  }else{
-                     res.json({
-                        success: true,
-                        message: 'The cart has been deleted',
-                        data: result
-                    });
+                    })
+                })*/
 
-                  }
-              });
-            }
-
+             }
         });
+    })
+
+    app.post('/api/checkout/get-delivery', function(req, res) {
+        libs.schemaCli.get('/settings', {
+            //
+        }, function(err, result) {
+            for(key in result.results[1].services) {
+                if(result.results[1].services[key].id == 'royal-mail-first-class') {
+                    cont.func.sendInfo(res, true, {data: result.results[1].services[key], message: 'Got delivery methods'});
+                }
+            }
+        })
     })
 
 	app.post('/api/member/signup', function(req, res) {
@@ -472,6 +567,22 @@ module.exports = function(app, models, cont, libs, stripe) {
 
     });
 
+    app.post('/api/member/update-profile', function(req, res) {
+        console.log(req.body);
+        libs.schemaCli.put('/accounts/{id}', {
+            id: req.body.data.userID,
+            password: req.body.data.password,
+            first_name: req.body.data.firstName,
+            last_name: req.body.data.lastName,
+            'billing.phone' : req.body.data.phone,
+            email: req.body.data.email
+        }, function(err, result) {
+            if(!err) {
+                cont.func.sendInfo(res, true, {data: result});
+            }
+        });
+    })
+
 
     app.post('/api/charge-card', function(req, res) {
 
@@ -493,18 +604,15 @@ module.exports = function(app, models, cont, libs, stripe) {
           currency: "gbp",
           source: token,
           description: "Example charge"
-            }, function(err, charge) {
+        }, function(err, charge) {
             if (err && err.type === 'StripeCardError') {
                 console.log(err)
-    // The card has been declined
             } else{
-                console.log(charge);
-                console.log("it has been charged");
                 res.json({
-                                status: true,
-                                data: charge,
-                                message: 'Successful payment!'
-                            });
+                    status: true,
+                    data: charge,
+                    message: 'Successful payment!'
+                });
             }
         });
 

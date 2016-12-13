@@ -2,7 +2,7 @@
 
 
 <!-- LIGHT SECTION -->
-      <section class="lightSection clearfix pageHeader">
+      <section ng-init="getProfileData()" class="lightSection clearfix pageHeader">
         <div class="container">
           <div class="row">
             <div class="col-xs-6">
@@ -21,7 +21,7 @@
           </div>
         </div>
       </section>
-      
+
       <!-- MAIN CONTENT SECTION -->
       <section class="mainContent clearfix userProfile">
         <div class="container">
@@ -43,55 +43,41 @@
                   <h4>profile</h4>
                 </div>
                 <div class="row">
-                  <div class="col-md-2 col-sm-3 col-xs-12">
-                    <div class="thumbnail">
-                      <img src="img/products/profile/profile-image.jpg" alt="profile-image">
-                      <div class="caption">
-                        <a href="#" class="btn btn-primary btn-block" role="button">Change Avatar</a>  
-                      </div>
-                    </div>
-                  </div>
                   <div class="col-md-10 col-sm-9 col-xs-12">
                       <form class="form-horizontal">
                         <div class="form-group">
                           <label for="" class="col-md-2 col-sm-3 control-label">First Name</label>
                           <div class="col-md-10 col-sm-9">
-                            <input type="text" class="form-control" id="" placeholder="">
+                            <input ng-model="newProfileData.firstName" type="text" class="form-control" id="" placeholder="{{profileInfo.first_name}}">
                           </div>
                         </div>
                         <div class="form-group">
                           <label for="" class="col-md-2 col-sm-3 control-label">Last Name</label>
                           <div class="col-md-10 col-sm-9">
-                            <input type="text" class="form-control" id="" placeholder="">
+                            <input ng-model="newProfileData.lastName" type="text" class="form-control" id="" placeholder="{{profileInfo.last_name}}">
                           </div>
                         </div>
                         <div class="form-group">
                           <label for="" class="col-md-2 col-sm-3 control-label">Phone Number</label>
                           <div class="col-md-10 col-sm-9">
-                            <input type="text" class="form-control" id="" placeholder="">
+                            <input ng-model="newProfileData.phone" type="text" class="form-control" id="" placeholder="">
                           </div>
                         </div>
                         <div class="form-group">
                           <label for="" class="col-md-2 col-sm-3 control-label">Email Address</label>
                           <div class="col-md-10 col-sm-9">
-                            <input type="email" class="form-control" id="" placeholder="">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="" class="col-md-2 col-sm-3 control-label">Password</label>
-                          <div class="col-md-10 col-sm-9">
-                            <input type="password" class="form-control" id="" placeholder="">
+                            <input ng-model="newProfileData.email" type="email" class="form-control" id="" placeholder="{{profileInfo.email}}">
                           </div>
                         </div>
                         <div class="form-group">
                           <label for="" class="col-md-2 col-sm-3 control-label">New Password</label>
                           <div class="col-md-10 col-sm-9">
-                            <input type="password" class="form-control" id="" placeholder="">
+                            <input ng-model="newProfileData.newPassword" type="password" class="form-control" id="" placeholder="">
                           </div>
                         </div>
                         <div class="form-group">
                           <div class="col-md-offset-10 col-md-2 col-sm-offset-9 col-sm-3">
-                            <button type="submit" class="btn btn-primary btn-block">SAVE INFO</button>
+                            <button ng-click="updateProfile()" type="submit" class="btn btn-primary btn-block">SAVE INFO</button>
                           </div>
                         </div>
                       </form>

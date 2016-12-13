@@ -20,12 +20,12 @@
             </div>
             <div class="col-md-6 col-xs-12">
               <ul class="list-inline pull-right">
-                <li><span><a data-toggle="modal" href='login'>Log in</a>
+                <li ng-if="details.loggedIn !== true"><span><a data-toggle="modal" href='login'>Log in</a>
                     <small>or</small>
                     <a data-toggle="modal" href='signup'>Create an account</a></span>
                 </li>
-                <li><span><a data-toggle="modal" href="/" ng-click="logout()">Log out</a></span></li>
-                <li><span><a data-toggle="modal" href="/account-dashboard">Account</a></span></li>
+                <li ng-if="details.loggedIn == true"><span><a data-toggle="modal" href="/" ng-click="logout()">Log out</a></span></li>
+                <li ng-if="details.loggedIn == true"><span><a data-toggle="modal" href="/account-dashboard">Account</a></span></li>
                 <li class="dropdown searchBox">
                   <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-search"></i></a>
                   <ul class="dropdown-menu dropdown-menu-right">
@@ -72,10 +72,9 @@
               <li class="dropdown megaDropMenu">
                 <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="300" data-close-others="true" aria-expanded="false">Categories</b></a>
                 <ul class="dropdown-menu row">
-                  <li class="col-sm-3 col-xs-12">
+                  <li ng-repeat="cat in localStorage.categoryList" class="col-sm-3 col-xs-12">
                     <ul class="list-unstyled">
-                      <li>Products Grid View</li>
-                      <li ng-repeat="cat in localStorage.categoryList">
+                      <li>
                           <a href="/{{cat.slug}}">{{cat.name}}</a>
                       </li>
                     </ul>

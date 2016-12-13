@@ -98,7 +98,7 @@
                       </div>
                       <div class="panel-body">
                         <address>
-                          <span>Credit Card - VISA</span>
+                          <span>Credit Card</span>
                         </address>
                       </div>
                     </div>
@@ -110,7 +110,7 @@
                       </div>
                       <div class="panel-body">
                         <address>
-                          <span>Post Air Mail</span>
+                          <span>Royal Mail First Class</span>
                         </address>
                       </div>
                     </div>
@@ -125,13 +125,13 @@
                           <div class="col-sm-4 col-xs-12">
                             <address>
                               <a href="#">Email: {{localStorage.user.email}}</a> <br>
-                              <span>Phone: {{localStorage.billingInfo.phone}}</span>
+                              <span>Phone: {{localStorage.billingInfo.phoneNumber}}</span>
                             </address>
                           </div>
                           <div class="col-sm-8 col-xs-12">
                             <address>
                               <span>Additional Information: </span><br>
-                              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+                              <p>Our shipping methods typically apply to business days only, not weekends or holidays. If available, Saturday or Sunday delivery dates will be specified on the product page and/or during checkout.</p>
                             </address>
                           </div>
                         </div>
@@ -154,7 +154,6 @@
                           <tbody>
                               <tr ng-repeat="item in cart.items">
                                 <td class="col-xs-2">
-                                  <button ng-click="removeItem(item.id)" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                   <span class="cartImage"><img width="70px" src="{{item.product.images[0].file.url}}" alt="image"></span>
                                 </td>
                                 <td class="col-xs-4">{{item.product.name}}</td>
@@ -170,7 +169,8 @@
                             <ul class="list-unstyled">
                               <li>Sub Total <span>{{prices.currency}}{{prices.subTotal}}</span></li>
                               <li>UK Vat <span>{{prices.currency}}{{prices.vat}}</span></li>
-                              <li>Grand Total <span class="grandTotal">{{prices.currency}}{{prices.grandTotal}}</span></li>
+                              <li>Delivery <span>{{prices.currency}}{{localStorage.cart.shipment_price}}</span></li>
+                              <li>Grand Total <span class="grandTotal">{{prices.currency}}{{localStorage.cart.grand_total_del}}</span></li>
                             </ul>
                         </div>
                       </div>

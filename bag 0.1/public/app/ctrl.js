@@ -39,7 +39,7 @@ app.controller('SingleProductCtrl', function($scope, $window, $location, $http, 
         prices.grandTotal = 0;
         if(items.length > 0) {
             for(key in items) {
-                prices.subTotal += (items[key].price * items[key].quantity);
+                prices.subTotal += (items[key].price * items[key].qty);
             }
             prices.vat = prices.subTotal * (prices.vatPercent / 100);
             prices.vat = Math.ceil(prices.vat * 10) / 10;
@@ -49,25 +49,29 @@ app.controller('SingleProductCtrl', function($scope, $window, $location, $http, 
 
 
     $scope.addToCart = function(productID, qty) {
-        cart.addToCart(productID, qty, $localStorage.cart.id, function(resp) {
-            console.log(resp);
-            var newCart = $.parseJSON(resp.data.data);
-            console.log(newCart);
-            $scope.localStorage.cart = newCart;
-            $('#myModal').modal();
-            $scope.updatePrices($localStorage.cart.items);
-            /*ModalService.showModal({
-                template: "<div>Fry lives in </div>",
-                ///templateUrl: "app/views/modals/add-to-cart.html",
-                controller: "ModalController"
-            }).then(function(modal) {
-                //it's a bootstrap element, use 'modal' to show it
-                modal.element.modal();
-                modal.close.then(function(result) {
-                    console.log(result);
-                });
-            });*/
-        })
+        var flag = 0;
+        flag = func.validate(qty, 'number', 'Choose a quantity!');
+        if(flag == 0) {
+            cart.addToCart(productID, qty, $localStorage.cart.id, function(resp) {
+                console.log(resp);
+                var newCart = $.parseJSON(resp.data.data);
+                console.log(newCart);
+                $scope.localStorage.cart = newCart;
+                $('#myModal').modal();
+                $scope.updatePrices($localStorage.cart.items);
+                /*ModalService.showModal({
+                    template: "<div>Fry lives in </div>",
+                    ///templateUrl: "app/views/modals/add-to-cart.html",
+                    controller: "ModalController"
+                }).then(function(modal) {
+                    //it's a bootstrap element, use 'modal' to show it
+                    modal.element.modal();
+                    modal.close.then(function(result) {
+                        console.log(result);
+                    });
+                });*/
+            })
+        }
     }
 
     $scope.toCart = function() {
@@ -92,6 +96,7 @@ app.controller('SingleProductCtrl', function($scope, $window, $location, $http, 
         $scope.numberToArray($scope.stockLevel);
     })
 
+
     $scope.numberToArray = function(num) {
         var tempNumArr = [];
         for(var i = 1; i < num+1; i++) {
@@ -112,7 +117,7 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
         prices.grandTotal = 0;
         if(items.length > 0) {
             for(key in items) {
-                prices.subTotal += (items[key].price * items[key].quantity);
+                prices.subTotal += (items[key].price * items[key].qty);
             }
             prices.vat = prices.subTotal * (prices.vatPercent / 100);
             prices.vat = Math.ceil(prices.vat * 10) / 10;
@@ -140,9 +145,7 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
 
     $scope.goToProductPage = function(catID, productURL) {
         for(k in $scope.categoryList) {
-            console.log(catID);
             if($scope.categoryList[k].id == catID) {
-                console.log($scope.categoryList[k].id);
                 $location.path('/'+$scope.categoryList[k].name+'/'+productURL);
             }
         }
@@ -170,6 +173,12 @@ app.controller('CartCtrl', function($scope, cart, $localStorage, prices, categor
 
 app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices, $http, $location) {
     $scope.localStorage = $localStorage;
+    $scope.chosenDeliveryMethod = true;
+    $scope.orderNumber = '';
+    $scope.number = '';
+    $scope.month = '';
+    $scope.year = '';
+    $scope.cvc = '';
 
     $scope.updatePrices = function(items) {
         prices.subTotal = 0;
@@ -187,49 +196,74 @@ app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices,
 
     $scope.updatePrices($localStorage.cart.items);
 
+    $scope.getDelivery = function() {
+        checkout.getDelivery(function(delivery) {
+            $scope.deliveryMethods = {};
+            $scope.deliveryMethods[0] = delivery;
+            $localStorage.cart.shipment_price = $scope.deliveryMethods[0].price;
+        })
+    }
+
+    $scope.addDelivery = function() {
+        $scope.localStorage.cart.grand_total_del = ($localStorage.cart.grand_total + $localStorage.cart.shipment_price);
+    }
+
+    $scope.deliveryClick = function() {
+        console.log($scope.chosenDeliveryMethod);
+    }
+
     $scope.completeCheckout = function() {
+        var total = $localStorage.cart.grand_total_del;
+        var userID = $localStorage.userID;
 
-        var total = $localStorage.cart.grand_total;
-        var userID = $localStorage.userID
+        var flag = 0;
+        if($scope.number.length !== 16) {
+            flag++;
+            toastr.warning('Card number should be 16 digits!');
+        }
+        if($scope.month.length !== 2 || $scope.month > 12) {
+            flag++;
+            toastr.warning('Card expiry month should be 2 digits & between 1-12');
+        }
+        if($scope.year.length !== 2) {
+            flag++;
+            toastr.warning('Card expiry year should be 2 digits!');
+        }
+        if($scope.cvc.length !== 3) {
+            flag++;
+            toastr.warning('Card cvc should be 3 digits!');
+        }
 
-        $(function() {
-          var $form = $('#payment-form');
-          $form.submit(function(event) {
-            // Disable the submit button to prevent repeated clicks:
-            $form.find('.submit').prop('disabled', true);
-
-            Stripe.setPublishableKey('pk_test_GrFP5ytVZ9Df9ZKztAJbiOmc');
-
-            // Request a token from Stripe:
-            Stripe.card.createToken($form, function(status, res) {
-                console.log(res);
-
-                res.total = total;
-                res.userID = userID;
-                $http.post("/api/charge-card", res, {total: total, userID: userID}).success(function(response){
-
-                    var paymentID = response.data.id;
-                    checkout.complete(paymentID, function(resp) {
-                    console.log(resp);
-                    delete $localStorage.cart;
-                    $location.url("/checkout-complete");
-
-                    })
-
-                });
-
+        if(flag < 1) {
+            Stripe.card.createToken({
+                  number: $scope.number,
+                  exp_month: $scope.month,
+                  exp_year: $scope.year,
+                  cvc: $scope.cvc
+            }, function(status, res) {
+                if(res.error) {
+                    toastr.warning(res.error.message);
+                } else {
+                    res.total = total;
+                    res.userID = userID;
+                    $http.post("/api/charge-card", res, {total: total, userID: userID}).then(function(response){
+                        var paymentID = response.data.id;
+                        checkout.complete(paymentID, function(resp) {
+                            if(resp.data.success == true) {
+                                delete $localStorage.cart;
+                                $scope.localStorage.orderNumber = resp.data.data;
+                                $location.url("/checkout-complete");
+                            }
+                        })
+                    });
+                }
             });
-
-            // Prevent the form from being submitted:
-            return false;
-          });
-        });
-
+        }
 
     }
 })
 
-app.controller('AddressCtrl', function($scope, $location, addresses, addressList, $localStorage, billingInfo, shippingInfo) {
+app.controller('AddressCtrl', function($scope, $location, addresses, addressList, $localStorage, billingInfo, shippingInfo, func) {
     $scope.addresses = addresses;
     $scope.addressList = addressList;
     $scope.billingInfo = billingInfo;
@@ -243,11 +277,11 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
     addresses.hasAddress = false;
     addresses.hasAddressShipping = false;
 
-    if($localStorage.billingInfo) {
-        $scope.billingInfo = $localStorage.billingInfo;
+    if($localStorage.user.billing) {
+        $scope.billingInfo = $localStorage.user.billing;
     }
-    if($localStorage.shippingInfo) {
-        $scope.shippingInfo = $localStorage.shippingInfo;
+    if($localStorage.user.shipping) {
+        $scope.shippingInfo = $localStorage.user.shipping;
     }
     if($localStorage.sameShippingAddress == false) {
         $scope.sameShippingAddress = $localStorage.sameShippingAddress;
@@ -261,51 +295,42 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
     }
 
     $scope.saveAddress = function() {
+        var flag = 0;
+        flag = func.validate($scope.billingInfo.name, 'text', 'Enter the billing name!');
+        flag = func.validate($scope.billingInfo.address1, 'text', 'Enter the address 1!');
+        flag = func.validate($scope.billingInfo.phoneNumber, 'text', 'Enter the billing phone number!');
+        flag = func.validate($scope.billingInfo.city, 'text', 'Enter the billing city!');
+        flag = func.validate($scope.billingInfo.postalCode, 'text', 'Enter the billing postal code!');
+        flag = func.validate($scope.billingInfo.name, 'text', 'Enter the billing name!');
 
-        $localStorage.sameShippingAddress = $scope.sameShippingAddress;
-        $localStorage.billingInfo = $scope.billingInfo;
-        if($scope.sameShippingAddress == false) {
-            $localStorage.shippingInfo = $scope.shippingInfo;
-        } else {
-            $scope.shippingInfo = $scope.billingInfo;
-            $localStorage.shippingInfo = $scope.shippingInfo;
+        if(flag == 0) {
+            var flag2 = 0;
+            $localStorage.sameShippingAddress = $scope.sameShippingAddress;
+            $localStorage.billingInfo = $scope.billingInfo;
+            if($scope.sameShippingAddress == false) {
+                $localStorage.shippingInfo = $scope.shippingInfo;
+                flag2 = func.validate($scope.shippingInfo.name, 'text', 'Enter the shipping name!');
+                flag2 = func.validate($scope.shippingInfo.address1, 'text', 'Enter the shipping address 1!');
+                flag2 = func.validate($scope.shippingInfo.phoneNumber, 'text', 'Enter the shipping phone number!');
+                flag2 = func.validate($scope.shippingInfo.city, 'text', 'Enter the shipping city!');
+                flag2 = func.validate($scope.shippingInfo.postalCode, 'text', 'Enter the shipping postal code!');
+            } else {
+                $scope.shippingInfo = $scope.billingInfo;
+                $localStorage.shippingInfo = $scope.shippingInfo;
+            }
+
+            if(flag2 == 0) {
+                addresses.saveAddress($localStorage.userID, $scope.billingInfo, $scope.shippingInfo, function(resp) {
+                    $localStorage.user = $.parseJSON(resp.data.data);
+                    $location.path('/checkout-step-2');
+                })
+            }
+
         }
 
-        addresses.saveAddress($localStorage.userID, $scope.billingInfo, $scope.shippingInfo, function(resp) {
-            $localStorage.user = $.parseJSON(resp.data.data);
-            $location.path('/checkout-step-2');
-        })
 
-        // /*for(key in $scope.addressList) {
-        //     if(angular.toJson($scope.billingInfo) === angular.toJson($scope.addressList[key])) {
-        //         $scope.billingMatches = true;
-        //     }
-        // }*/
-        //
-        // if($scope.sameShippingAddress == false) {
-        //     $localStorage.shippingInfo = $scope.shippingInfo;
-        //     /*for(key in $scope.addressList) {
-        //         if(angular.toJson($scope.shippingInfo) === angular.toJson($scope.addressList[key])) {
-        //             $scope.shippingMatches = true;
-        //         }
-        //     }*/
-        //     if($scope.billingMatches == true && $scope.shippingMatches == true ) {
-        //         $location.path('/checkout-step-2');
-        //     } else {
-        //         if($scope.billingMatches == true) {
-        //             var newAdd = $scope.shippingInfo;
-        //         } else {
-        //             var newAdd = $scope.billingInfo;
-        //         }
-        //         addresses.saveAddress($localStorage.userID, newAdd, function(resp) {
-        //             $location.path('/checkout-step-2');
-        //         })
-        //     }
-        // } else {
-        //     if($scope.billingMatches == true) {
-        //         $location.path('/checkout-step-2');
-        //     }
-        // }*/
+
+
     }
 
     $scope.deleteAddress = function(key) {
@@ -321,12 +346,21 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
         })
     }
 
-    $scope.populateBilling = function($index) {
-        $scope.billingInfo = $scope.addressList[$index];
+    $scope.populateBilling = function(type) {
+        if(type == 'billing') {
+            $scope.billingInfo = $localStorage.user.billing;
+        } else {
+            $scope.billingInfo = $localStorage.user.shipping;
+        }
         $scope.populated = true;
+        console.log($scope.billingInfo);
     }
-    $scope.populateShipping = function($index) {
-        $scope.shippingInfo = $scope.addressList[$index];
+    $scope.populateShipping = function(type) {
+        if(type == 'billing') {
+            $scope.shippingInfo = $localStorage.user.billing;
+        } else {
+            $scope.shippingInfo = $localStorage.user.shipping;
+        }
         $scope.shippingPopulated = true;
     }
 
@@ -346,13 +380,59 @@ app.controller('AddressCtrl', function($scope, $location, addresses, addressList
 
 })
 
-app.controller('OrdersCtrl', function($scope, orders, $localStorage) {
-
+app.controller('OrdersCtrl', function($scope, orders, $localStorage, $location, prices, product) {
+    $scope.prices = prices;
 
     orders.getOrders(function(resp) {
         $localStorage.orders = $.parseJSON(resp.data.data);
         $scope.orders = $localStorage.orders;
+        $scope.user = $localStorage.user;
+        $scope.currentProd = [];
+
+        $scope.orderID = $location.path().split('/')[2];
+        //$scope.orders
+        for(key in $scope.orders.results) {
+            if($scope.orders.results[key].number == $scope.orderID) {
+                $scope.currentOrder = $scope.orders.results[key];
+            }
+            //console.log($scope.currentOrder);
+            if(parseInt(key)+1 == $scope.orders.results.length) {
+                //console.log('in');
+                var idArr = [];
+                for(key in $scope.currentOrder.items) {
+                    idArr[key] = $scope.currentOrder.items[key].product_id;
+                    if(parseInt(key)+1 == $scope.currentOrder.items.length) {
+                        //console.log('in2');
+                        product.getProductFromID(idArr, function(resp) {
+                            console.log(resp.length);
+                            if(resp.length > 1) {
+                                for(key in resp) {
+                                    $scope.currentProd[key] = $.parseJSON(resp[key]);
+                                }
+                            } else {
+                                $scope.currentProd[0] = $.parseJSON(resp);
+                            }
+                            console.log($scope.currentProd);
+                            /*console.log(resp.results[0]);
+                            $scope.single = resp.results[0];
+                            $scope.single.description = func.htmlToPlaintext($scope.single.description);
+                            $scope.stockLevel = $scope.single.stock_level;
+                            $scope.numberToArray($scope.stockLevel);*/
+                        })
+                    }
+                }
+
+
+            }
+        }
+
+
+
     })
+
+
+
+
 })
 
 app.controller('NaviCtrl', function($scope, details, member, customjs, $http, product, category, categoryList, $localStorage, func, cart, prices) {
@@ -416,7 +496,7 @@ app.controller('NaviCtrl', function($scope, details, member, customjs, $http, pr
     }
 })
 
-app.controller('MemberCtrl', function($scope, $http, $location, auth, member, alerts) {
+app.controller('MemberCtrl', function($scope, $http, $location, auth, member, alerts, $localStorage, func) {
     $scope.signupData = {};
     $scope.confirmPassword = '';
     $scope.loginData = {};
@@ -425,17 +505,41 @@ app.controller('MemberCtrl', function($scope, $http, $location, auth, member, al
     $scope.newPassword = '';
     $scope.resetCode = $location.search().code;
 
+    $scope.getProfileData = function() {
+        $scope.profileInfo = $localStorage.user;
+        $scope.newProfileData = {};
+    }
 
+    $scope.updateProfile = function() {
+        $scope.newProfileData.userID = $localStorage.userID;
+        member.updateProfile($scope.newProfileData, function(userData) {
+            $localStorage.user = $.parseJSON(userData.data);
+            $scope.profileInfo = $localStorage.user;
+        })
+    }
 
     $scope.signupDataSubmit = function() {
-        console.log($scope.signupData);
-        member.signup($scope.signupData);
+        var flag = 0;
+        flag = func.validate($scope.signupData.fName, 'text', 'Enter your first name!');
+        flag = func.validate($scope.signupData.lName, 'text', 'Enter your last name!');
+        flag = func.validate($scope.signupData.email, 'email', 'Enter a valid email!');
+        flag = func.validate($scope.signupData.password, 'password', 'Enter your password!<br>Minimum 6 characters.');
+
+        if(flag == 0) {
+            member.signup($scope.signupData);
+        }
+
     }
 
     $scope.loginDataSubmit = function() {
-        member.login($scope.loginData, function() {
+        var flag = 0;
+        flag = func.validate($scope.loginData.email, 'email', 'Enter a valid email!');
+        flag = func.validate($scope.loginData.password, 'password', 'Enter your password!<br>Minimum 6 characters.');
+        if(flag == 0) {
+            member.login($scope.loginData, function() {
 
-        });
+            });
+        }
     }
 
     $scope.forgotPasswordSubmit = function() {

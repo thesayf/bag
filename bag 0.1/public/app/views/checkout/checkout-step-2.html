@@ -2,7 +2,7 @@
 
 
 <!-- LIGHT SECTION -->
-      <section class="lightSection clearfix pageHeader">
+      <section ng-init="getDelivery()" class="lightSection clearfix pageHeader">
         <div class="container">
           <div class="row">
             <div class="col-xs-6">
@@ -61,32 +61,6 @@
                       <h4>Choose your Delivery method</h4>
                     </div>
                   </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">Conutry</label>
-                    <span class="step-drop">
-                      <select name="guiest_id3" id="guiest_id3" class="select-drop">
-                        <option value="0">Choose</option>
-                        <option value="1">Choose 1</option>
-                        <option value="2">Choose 2</option>
-                        <option value="3">Choose 3</option>
-                      </select>
-                    </span>
-                  </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">State</label>
-                    <span class="step-drop">
-                      <select name="guiest_id3" id="guiest_id3" class="select-drop">
-                        <option value="0">Choose</option>
-                        <option value="1">Choose 1</option>
-                        <option value="2">Choose 2</option>
-                        <option value="3">Choose 3</option>
-                      </select>
-                    </span>
-                  </div>
-                  <div class="form-group col-sm-4 col-xs-12">
-                    <label for="">Zip Code</label>
-                    <input type="text" class="form-control" id="">
-                  </div>
                   <div class="col-xs-12">
                     <div class="orderBox">
                       <div class="table-responsive">
@@ -101,30 +75,19 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <td class="col-xs-1"><i class="fa fa-plane" aria-hidden="true"></i></td>
-                              <td>by Air</td>
-                              <td>Delivery next day!</td>
-                              <td>$ 99.00</td>
+                            <tr ng-repeat="del in deliveryMethods">
+                              <td class="col-xs-1"><i class="fa fa-envelope" aria-hidden="true"></i></td>
+                              <td>by Post</td>
+                              <td>{{del.name}}</td>
+                              <td>{{prices.currency}}{{del.price}}</td>
                               <td>
                                 <div class="checkboxArea">
-                                  <input id="checkbox1" type="checkbox" name="checkbox" value="1" checked="checked">
+                                  <input class="disabled" ng-click="deliveryClick()" ng-model="chosenDeliveryMethod" id="checkbox1" type="checkbox" checked="checked" name="checkbox" disabled >
                                   <label for="checkbox1"><span></span></label>
                                 </div>
                               </td>
                             </tr>
-                            <tr>
-                              <td class="col-xs-1"><i class="fa fa-ship" aria-hidden="true"></i></td>
-                              <td>by Ship</td>
-                              <td>Pick up in-store</td>
-                              <td>$ 39.00</td>
-                              <td>
-                                <div class="checkboxArea">
-                                  <input id="checkbox2" type="checkbox" name="checkbox" value="1">
-                                  <label for="checkbox2"><span></span></label>
-                                </div>
-                              </td>
-                            </tr>
+
                           </tbody>
                         </table>
                       </div>
@@ -134,7 +97,7 @@
                     <div class="well well-lg clearfix">
                       <ul class="pager">
                       <li class="previous"><a ng-href="/checkout-step-1">back</a></li>
-                        <li class="next"><a href="/checkout-step-3">Continue</a></li>
+                        <li class="next"><a ng-click="addDelivery()" href="/checkout-step-3">Continue</a></li>
                       </ul>
                     </div>
                   </div>

@@ -61,17 +61,18 @@
                       <h4>Billing information</h4>
                     </div>
                   </div>
-                  <div ng-if="addresses.hasAddress == true" class="form-group col-sm-12 col-xs-12">
+                  <div ng-if="billingInfo || shippingInfo" class="form-group col-sm-12 col-xs-12">
                       <p>Use existing address:
                           <select class="form-control">
                               <option selected disabled>Choose Address</option>
-                              <option ng-repeat="add in addressList" ng-click="populateBilling($index)">{{add.address1}} {{add.city}} {{add.postalCode}} {{add.country}}</option>
+                              <option ng-if="billingInfo" ng-click="populateBilling('billing')">{{billingInfo.address1}} {{billingInfo.city}} {{billingInfo.postalCode}}</option>
+                              <option ng-if="shippingInfo" ng-click="populateBilling('shipping')">{{shippingInfo.address1}} {{shippingInfo.city}} {{shippingInfo.postalCode}}</option>
                           </select>
                       </p>
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Full Name</label>
-                    <input ng-model="billingInfo.fullName" type="text" class="form-control" id="">
+                    <input ng-model="billingInfo.name" type="text" class="form-control" id="">
                   </div>
                   <div class="form-group col-sm-6 col-xs-12">
                     <label for="">Address</label>
@@ -107,13 +108,14 @@
                           <p>Use existing address:
                               <select class="form-control">
                                   <option selected disabled>Choose Address</option>
-                                  <option ng-repeat="add in addressList" ng-click="populateShipping($index)">{{add.address1}} {{add.city}} {{add.postalCode}} {{add.country}}</option>
+                                  <option ng-if="billingInfo" ng-click="populateShipping('billing')">{{billingInfo.address1}} {{billingInfo.city}} {{billingInfo.postalCode}}</option>
+                                  <option ng-if="shippingInfo" ng-click="populateShipping('shipping')">{{shippingInfo.address1}} {{shippingInfo.city}} {{shippingInfo.postalCode}}</option>
                               </select>
                           </p>
                       </div>
                       <div class="form-group col-sm-6 col-xs-12">
                         <label for="">Full Name</label>
-                        <input ng-model="shippingInfo.fullName" type="text" class="form-control" id="">
+                        <input ng-model="shippingInfo.name" type="text" class="form-control" id="">
                       </div>
                       <div class="form-group col-sm-6 col-xs-12">
                         <label for="">Address</label>

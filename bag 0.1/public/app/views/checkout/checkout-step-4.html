@@ -54,48 +54,48 @@
                   </div>
                 </div>
 
-       <div class="col-xs-12 col-md-8">
-        
-             <form action="/your-charge-code" method="POST" id="payment-form">
+       <div class="col-xs-12 col-md-12">
+
+             <form method="POST" id="payment-form">
                   <span class="payment-errors"></span>
-
-                  <div class="form-row">
-                    <label>
-                      <span>Card Number</span>
-                      <input type="text" size="20" data-stripe="number">
-                    </label>
+                  <div class="row">
+                      <div class="form-group col-sm-4 col-xs-12">
+                        <label for="">Card Number</label>
+                        <input ng-model="number" type="text" size="2" data-stripe="number" class="form-control" id="">
+                      </div>
                   </div>
-
-                  <div class="form-row">
-                    <label>
-                      <span>Expiration (MM/YY)</span>
-                      <input type="text" size="2" data-stripe="exp_month">
-                    </label>
-                    <span> / </span>
-                    <input type="text" size="2" data-stripe="exp_year">
+                  <div class="row">
+                      <div class="form-group col-sm-2 col-xs-12">
+                        <label for="">Expiration Month (MM)</label>
+                        <input ng-model="month" type="text" size="2" data-stripe="exp_month" class="form-control">
+                      </div>
+                      <div class="form-group col-sm-2 col-xs-12">
+                        <label for="">Expiration Year (YY)</label>
+                        <input ng-model="year" type="text" size="2" data-stripe="exp_year" class="form-control">
+                      </div>
                   </div>
-
-                  <div class="form-row">
-                    <label>
-                      <span>CVC</span>
-                      <input type="text" size="4" data-stripe="cvc">
-                    </label>
+                  <div class="row">
+                      <div class="form-group col-sm-4 col-xs-12">
+                        <label for="">CVC</label>
+                        <input ng-model="cvc" type="text" size="2" data-stripe="cvc" class="form-control" id="">
+                      </div>
                   </div>
-
-
-                  <input ng-click="completeCheckout()" type="submit" class="submit" value="Submit Payment">
                 </form>
-            
-        </div>    
-                  <div class="col-xs-12">
-                    <div class="well well-lg clearfix">
-                      <ul class="pager">
-                      <li class="previous"><a href="/checkout-step-3">Back</a></li>
-                        <li class="next "><a class="pointer" ng-click="completeCheckout()">Confirm</a></li>
-                      </ul>
-                    </div>
+                <div class="row">
+                <div class="col-xs-12">
+
+                  <div class="well well-lg clearfix">
+                    <ul class="pager">
+                    <li class="previous"><a href="/checkout-step-3">Back</a></li>
+                      <li class="next "><a class="pointer" ng-click="completeCheckout()">Confirm</a></li>
+                    </ul>
                   </div>
-        
+                </div>
+                </div>
+
+        </div>
+
+
               </div>
             </div>
           </div>
@@ -106,8 +106,8 @@
     <div class="row">
         <!-- You can make it whatever width you want. I'm making it full width
              on <= small devices and 4/12 page width on >= medium devices -->
-   
-        
+
+
     </div>
 </div>
 
