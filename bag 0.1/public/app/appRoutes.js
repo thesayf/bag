@@ -22,22 +22,26 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 
     .when('/checkout-step-2', {
         templateUrl : viewDir+'checkout/checkout-step-2.html',
-        controller  : 'CheckoutCtrl'
+        controller  : 'CheckoutCtrl',
+        type: 'protected'
     })
 
     .when('/checkout-step-3', {
         templateUrl : viewDir+'checkout/checkout-step-3.html',
-        controller  : 'CheckoutCtrl'
+        controller  : 'CheckoutCtrl',
+        type: 'protected'
     })
 
     .when('/checkout-step-4', {
         templateUrl : viewDir+'checkout/checkout-step-4.html',
-        controller  : 'CheckoutCtrl'
+        controller  : 'CheckoutCtrl',
+        type: 'protected'
     })
 
     .when('/checkout-complete', {
         templateUrl : viewDir+'checkout/checkout-complete.html',
-        controller  : 'CheckoutCtrl'
+        controller  : 'CheckoutCtrl',
+        type: 'protected'
     })
 
     .when('/signup', {
@@ -58,22 +62,26 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 
     .when('/account-profile', {
         templateUrl : viewDir+'member/account-profile.html',
-        controller  : 'MemberCtrl'
+        controller  : 'MemberCtrl',
+        type: 'protected'
     })
 
     .when('/account-address', {
         templateUrl : viewDir+'member/account-address.html',
-        controller  : 'AddressCtrl'
+        controller  : 'AddressCtrl',
+        type: 'protected'
     })
 
     .when('/account-all-orders', {
         templateUrl : viewDir+'member/account-all-orders.html',
-        controller  : 'OrdersCtrl'
+        controller  : 'OrdersCtrl',
+        type: 'protected'
     })
 
     .when('/account-wishlist', {
         templateUrl : viewDir+'member/account-wishlist.html',
-        controller  : 'MemberCtrl'
+        controller  : 'MemberCtrl',
+        type: 'protected'
     })
 
 
@@ -129,6 +137,7 @@ app.config(function(/*$stateProvider, $urlRouterProvider,*/ $locationProvider, $
 app.run(function($http, $localStorage, $log, $location, details, $rootScope) {
     $rootScope.$on('$routeChangeSuccess', function (e, current, pre) {
         var type = current.type;
+        console.log(type);
         if(type == 'protected') {
             var token = $localStorage.token;
             if(token) {

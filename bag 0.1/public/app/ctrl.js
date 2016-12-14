@@ -184,7 +184,7 @@ app.controller('CheckoutCtrl', function($scope, $localStorage, checkout, prices,
         prices.subTotal = 0;
         prices.vat = 0;
         prices.grandTotal = 0;
-        if(items.length > 0) {
+        if(items && items.length > 0) {
             for(key in items) {
                 prices.subTotal += (items[key].price * items[key].quantity);
             }
